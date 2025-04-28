@@ -21,11 +21,11 @@ import { Card, CardContent } from "@/components/ui/card";
 
 // Validation schema for invoice items
 const invoiceItemSchema = z.object({
-  id: z.string().optional(),
+  id: z.string(),
   description: z.string().min(1, "Description is required"),
   quantity: z.coerce.number().positive("Quantity must be positive"),
   unitPrice: z.coerce.number().positive("Unit price must be positive"),
-  amount: z.number().optional(),
+  amount: z.number(),
 });
 
 // Validation schema for the entire invoice
@@ -113,7 +113,7 @@ const InvoiceForm = ({ invoice, onSubmit, onCancel }: InvoiceFormProps) => {
     });
     
     // Calculate invoice totals
-    const { subtotal, taxAmount, total } = calculateInvoiceTotals(updatedItems, taxRate);
+    const { subtotal, taxAmount, total } = calculateInvoiceTotals(updatedItems as InvoiceItem[], taxRate);
     
     form.setValue("subtotal", subtotal);
     form.setValue("taxAmount", taxAmount);
@@ -122,7 +122,7 @@ const InvoiceForm = ({ invoice, onSubmit, onCancel }: InvoiceFormProps) => {
 
   const handleSubmit = (values: InvoiceFormValues) => {
     const { subtotal, taxAmount, total } = calculateInvoiceTotals(
-      values.items, 
+      values.items as InvoiceItem[], 
       values.taxRate
     );
     
