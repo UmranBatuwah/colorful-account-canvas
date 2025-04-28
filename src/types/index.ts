@@ -47,3 +47,35 @@ export interface MonthlyData {
   income: number;
   expense: number;
 }
+
+export interface InvoiceStatus {
+  value: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
+  label: string;
+  color: string;
+}
+
+export interface InvoiceItem {
+  id: string;
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  amount: number;
+}
+
+export interface Invoice {
+  id: string;
+  invoiceNumber: string;
+  customerName: string;
+  customerEmail: string;
+  issueDate: Date;
+  dueDate: Date;
+  items: InvoiceItem[];
+  subtotal: number;
+  taxRate: number;
+  taxAmount: number;
+  total: number;
+  notes?: string;
+  status: InvoiceStatus['value'];
+  createdAt: Date;
+  updatedAt: Date;
+}

@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, BarChart2, PieChart, FilePlus, Database, CreditCard, Tag, Settings, ChevronLeft } from 'lucide-react';
+import { Home, BarChart2, PieChart, FilePlus, Database, CreditCard, Tag, Settings, ChevronLeft, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
@@ -24,6 +24,11 @@ const DashboardSidebar = () => {
       title: 'Categories',
       icon: Tag,
       path: '/categories',
+    },
+    {
+      title: 'Invoices',
+      icon: FileText,
+      path: '/invoices',
     },
     {
       title: 'Reports',
