@@ -87,7 +87,8 @@ const ProfileSettings = () => {
           <div className="flex flex-col items-center sm:flex-row sm:items-start gap-4">
             <div className="flex flex-col items-center gap-2">
               <Avatar className="h-24 w-24">
-                <AvatarImage src={user?.avatar_url || ''} />
+                {/* Fixed: Changed avatar_url to match the User type in AuthContext */}
+                <AvatarImage src={''} />
                 <AvatarFallback className="text-lg">
                   {user?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
                 </AvatarFallback>
