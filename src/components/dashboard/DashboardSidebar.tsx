@@ -1,0 +1,106 @@
+
+import { useState } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
+import { Home, BarChart2, PieChart, FilePlus, Database, CreditCard, Tag, Settings, ChevronLeft } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+
+const DashboardSidebar = () => {
+  const [collapsed, setCollapsed] = useState(false);
+  const location = useLocation();
+  
+  const menuItems = [
+    {
+      title: 'Dashboard',
+      icon: Home,
+      path: '/dashboard',
+    },
+    {
+      title: 'Transactions',
+      icon: CreditCard,
+      path: '/transactions',
+    },
+    {
+      title: 'Categories',
+      icon: Tag,
+      path: '/categories',
+    },
+    {
+      title: 'Reports',
+      icon: BarChart2,
+      path: '/reports',
+    },
+  ];
+
+  return (
+    <aside 
+      className={cn(
+        'bg-white border-r border-gray-200 flex flex-col h-screen transition-all duration-300',
+        collapsed ? 'w-16' : 'w-64'
+      )}
+    >
+      <div className="p-4 flex items-center justify-between">
+        {!collapsed && (
+          <h2 className="text-xl font-bold text-gradient">
+            FinTrackr
+          </h2>
+        )}
+        <Button
+          variant="ghost"
+          size="sm"
+          className={cn(
+            "rounded-full p-2",
+            collapsed && "mx-auto"
+          )}
+          onClick={() => setCollapsed(!collapsed)}
+        >
+          <ChevronLeft 
+            className={cn(
+              "h-5 w-5 text-gray-500 transition-transform",
+              collapsed && "rotate-180"
+            )} 
+          />
+        </Button>
+      </div>
+      
+      <div className="flex flex-col flex-1 overflow-y-auto py-4 px-3">
+        <nav className="space-y-1">
+          {menuItems.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className={({ isActive }) => cn(
+                'flex items-center px-3 py-2 rounded-lg transition-colors',
+                isActive 
+                  ? 'bg-primary text-white' 
+                  : 'text-gray-700 hover:bg-gray-100',
+                collapsed && 'justify-center'
+              )}
+            >
+              <item.icon className={cn("h-5 w-5", collapsed ? 'mx-0' : 'mr-3')} />
+              {!collapsed && <span>{item.title}</span>}
+            </NavLink>
+          ))}
+        </nav>
+      </div>
+      
+      <div className="p-3">
+        <NavLink
+          to="/settings"
+          className={({ isActive }) => cn(
+            'flex items-center px-3 py-2 rounded-lg transition-colors',
+            isActive 
+              ? 'bg-primary text-white' 
+              : 'text-gray-700 hover:bg-gray-100',
+            collapsed && 'justify-center'
+          )}
+        >
+          <Settings className={cn("h-5 w-5", collapsed ? 'mx-0' : 'mr-3')} />
+          {!collapsed && <span>Settings</span>}
+        </NavLink>
+      </div>
+    </aside>
+  );
+};
+
+export default DashboardSidebar;
