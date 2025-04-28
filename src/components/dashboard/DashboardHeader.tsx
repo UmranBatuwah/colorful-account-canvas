@@ -36,6 +36,15 @@ const DashboardHeader = ({ title }: DashboardHeaderProps) => {
       .toUpperCase();
   };
 
+  const navigateToSettings = () => {
+    navigate('/settings');
+  };
+
+  const navigateToProfile = () => {
+    // Navigate to settings page with profile tab selected
+    navigate('/settings');
+  };
+
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
       <div className="px-4 py-4 md:px-6 flex items-center justify-between">
@@ -88,8 +97,8 @@ const DashboardHeader = ({ title }: DashboardHeaderProps) => {
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Settings</DropdownMenuItem>
+              <DropdownMenuItem onClick={navigateToProfile}>Profile</DropdownMenuItem>
+              <DropdownMenuItem onClick={navigateToSettings}>Settings</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
             </DropdownMenuContent>
