@@ -23,7 +23,7 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
   // Check if user is authenticated
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      navigate('/login');
+      navigate('/auth');
     }
   }, [isAuthenticated, isLoading, navigate]);
   

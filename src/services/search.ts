@@ -1,159 +1,145 @@
 
+import { supabase } from '@/integrations/supabase/client';
+import { Transaction, Category, Invoice } from '@/types';
 import { getTransactions } from './transactions';
 import { getCategories } from './categories';
 import { getInvoices } from './invoices';
 
-export type SearchResultType = 'transaction' | 'category' | 'invoice';
-
 export interface SearchResult {
   id: string;
   title: string;
-  description?: string;
-  amount?: number;
+  description: string;
+  type: 'transaction' | 'category' | 'invoice';
   date?: Date;
-  type: SearchResultType;
-  relevance: number; // For better sorting
+  amount?: number;
 }
 
-// Create a memoized results cache to improve performance on repeated searches
-let cachedResults: { [key: string]: SearchResult[] } = {};
-let lastSearch = '';
+let cachedResults: {
+  transactions: Transaction[];
+  categories: Category[];
+  invoices: Invoice[];
+} | null = null;
 
-export const searchAll = (query: string): SearchResult[] => {
-  if (!query || query.trim() === '') {
-    return [];
+// Clear search cache when data changes
+export const clearSearchCache = () => {
+  cachedResults = null;
+};
+
+// Helper function to load all searchable data
+const loadSearchData = async () => {
+  if (cachedResults) {
+    return cachedResults;
   }
 
-  const normalizedQuery = query.toLowerCase().trim();
-  
-  // Check cache for exact match first for instant results
-  if (cachedResults[normalizedQuery]) {
-    return cachedResults[normalizedQuery];
-  }
-  
-  // Check if this is just extending the previous search query (typing more letters)
-  // If so, we can filter the previous results instead of searching everything again
-  if (normalizedQuery.startsWith(lastSearch) && lastSearch.length > 0) {
-    const filteredResults = cachedResults[lastSearch].filter(result => {
-      const titleMatch = result.title.toLowerCase().includes(normalizedQuery);
-      const descriptionMatch = result.description?.toLowerCase().includes(normalizedQuery);
-      return titleMatch || descriptionMatch;
-    });
+  try {
+    // Try to get user session
+    const { data: { session } } = await supabase.auth.getSession();
     
-    // Update cache and last search
-    cachedResults[normalizedQuery] = filteredResults;
-    lastSearch = normalizedQuery;
+    if (session) {
+      // If authenticated, get data from Supabase
+      // These functions already have Supabase implementation with local storage fallback
+      const [transactions, categories, invoices] = await Promise.all([
+        getTransactions(),
+        getCategories(),
+        getInvoices()
+      ]);
+      
+      cachedResults = {
+        transactions,
+        categories, 
+        invoices
+      };
+    } else {
+      // Get mock data from local storage
+      const transactions = await getTransactions();
+      const categories = await getCategories();
+      const invoices = await getInvoices();
+      
+      cachedResults = {
+        transactions,
+        categories,
+        invoices
+      };
+    }
     
-    return filteredResults;
+    return cachedResults;
+  } catch (error) {
+    console.error('Error loading search data:', error);
+    const transactions = await getTransactions();
+    const categories = await getCategories();
+    const invoices = await getInvoices();
+    
+    cachedResults = {
+      transactions,
+      categories,
+      invoices
+    };
+    
+    return cachedResults;
   }
+};
+
+export const searchAll = async (query: string): Promise<SearchResult[]> => {
+  if (!query) return [];
   
-  // Full search when needed
-  const queryTerms = normalizedQuery.split(/\s+/);
+  const lowerCaseQuery = query.toLowerCase();
+  const data = await loadSearchData();
+  
   const results: SearchResult[] = [];
-
+  
   // Search transactions
-  const transactions = getTransactions();
-  transactions.forEach(transaction => {
-    let relevance = 0;
-    const descriptionMatch = transaction.description?.toLowerCase().includes(normalizedQuery);
-    const noteMatch = transaction.note?.toLowerCase().includes(normalizedQuery);
-    
-    // Calculate relevance score
-    if (descriptionMatch) relevance += 10;
-    if (noteMatch) relevance += 5;
-    
-    // Check for individual term matches
-    queryTerms.forEach(term => {
-      if (transaction.description?.toLowerCase().includes(term)) relevance += 3;
-      if (transaction.note?.toLowerCase().includes(term)) relevance += 2;
-    });
-    
-    if (relevance > 0) {
+  data.transactions.forEach(transaction => {
+    if (
+      transaction.description.toLowerCase().includes(lowerCaseQuery) ||
+      (transaction.note && transaction.note.toLowerCase().includes(lowerCaseQuery)) ||
+      (transaction.category && transaction.category.name.toLowerCase().includes(lowerCaseQuery))
+    ) {
       results.push({
         id: transaction.id,
-        title: transaction.description || 'Unnamed Transaction',
-        description: `${transaction.type === 'income' ? 'Income' : 'Expense'} - ${transaction.amount.toFixed(2)}`,
-        amount: transaction.amount,
-        date: transaction.date,
+        title: transaction.description,
+        description: transaction.category 
+          ? `${transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)} - ${transaction.category.name}`
+          : `${transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}`,
         type: 'transaction',
-        relevance
+        date: new Date(transaction.date),
+        amount: transaction.amount,
       });
     }
   });
-
+  
   // Search categories
-  const categories = getCategories();
-  categories.forEach(category => {
-    let relevance = 0;
-    const nameMatch = category.name.toLowerCase().includes(normalizedQuery);
-    const descriptionMatch = category.description?.toLowerCase().includes(normalizedQuery);
-    
-    // Calculate relevance score
-    if (nameMatch) relevance += 12;
-    if (descriptionMatch) relevance += 6;
-    
-    // Check for individual term matches
-    queryTerms.forEach(term => {
-      if (category.name.toLowerCase().includes(term)) relevance += 4;
-      if (category.description?.toLowerCase().includes(term)) relevance += 2;
-    });
-    
-    if (relevance > 0) {
+  data.categories.forEach(category => {
+    if (
+      category.name.toLowerCase().includes(lowerCaseQuery) ||
+      (category.description && category.description.toLowerCase().includes(lowerCaseQuery))
+    ) {
       results.push({
         id: category.id,
         title: category.name,
-        description: category.description || 'No description',
+        description: `${category.type.charAt(0).toUpperCase() + category.type.slice(1)} Category${category.description ? ` - ${category.description}` : ''}`,
         type: 'category',
-        relevance
       });
     }
   });
-
+  
   // Search invoices
-  const invoices = getInvoices();
-  invoices.forEach(invoice => {
-    let relevance = 0;
-    const numberMatch = invoice.invoiceNumber.toLowerCase().includes(normalizedQuery);
-    const customerNameMatch = invoice.customerName.toLowerCase().includes(normalizedQuery);
-    const customerEmailMatch = invoice.customerEmail.toLowerCase().includes(normalizedQuery);
-    
-    // Calculate relevance score
-    if (numberMatch) relevance += 15;
-    if (customerNameMatch) relevance += 10;
-    if (customerEmailMatch) relevance += 8;
-    
-    // Check for individual term matches
-    queryTerms.forEach(term => {
-      if (invoice.invoiceNumber.toLowerCase().includes(term)) relevance += 5;
-      if (invoice.customerName.toLowerCase().includes(term)) relevance += 3;
-      if (invoice.customerEmail.toLowerCase().includes(term)) relevance += 2;
-    });
-    
-    if (relevance > 0) {
+  data.invoices.forEach(invoice => {
+    if (
+      invoice.invoiceNumber.toLowerCase().includes(lowerCaseQuery) ||
+      invoice.customerName.toLowerCase().includes(lowerCaseQuery) ||
+      invoice.customerEmail.toLowerCase().includes(lowerCaseQuery) ||
+      (invoice.notes && invoice.notes.toLowerCase().includes(lowerCaseQuery))
+    ) {
       results.push({
         id: invoice.id,
-        title: `Invoice #${invoice.invoiceNumber}`,
-        description: `${invoice.customerName} - ${invoice.total.toFixed(2)}`,
-        amount: invoice.total,
-        date: invoice.issueDate,
+        title: `${invoice.invoiceNumber} - ${invoice.customerName}`,
+        description: `${invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)} Invoice - $${invoice.total.toFixed(2)}`,
         type: 'invoice',
-        relevance
+        date: new Date(invoice.issueDate),
+        amount: invoice.total,
       });
     }
   });
-
-  // Sort results by relevance (highest first)
-  results.sort((a, b) => b.relevance - a.relevance);
   
-  // Update cache and last search term
-  cachedResults[normalizedQuery] = results.slice(0, 10); // Limit to 10 results
-  lastSearch = normalizedQuery;
-  
-  return results.slice(0, 10); // Limit to 10 results
-};
-
-// Function to clear the cache if needed (e.g., after data changes)
-export const clearSearchCache = () => {
-  cachedResults = {};
-  lastSearch = '';
+  return results;
 };

@@ -1,118 +1,68 @@
 
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { Menu, Bell, ChevronDown } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Menu, Bell, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
-import GlobalSearch from './search/GlobalSearch';
+import GlobalSearch from '@/components/dashboard/search/GlobalSearch';
+import { useAuth } from '@/context/AuthContext';
 
 interface DashboardHeaderProps {
   title: string;
 }
 
 const DashboardHeader = ({ title }: DashboardHeaderProps) => {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  // Add keyboard shortcut for search (Cmd+K or Ctrl+K)
+  const [greeting, setGreeting] = useState('');
+  const { user, logout } = useAuth();
+  
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        document.querySelector<HTMLElement>('.search-trigger')?.click();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
+    const hour = new Date().getHours();
+    if (hour < 12) {
+      setGreeting('Good morning');
+    } else if (hour < 18) {
+      setGreeting('Good afternoon');
+    } else {
+      setGreeting('Good evening');
+    }
   }, []);
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase();
-  };
-
-  const navigateToProfile = () => {
-    // Navigate to settings page with profile tab selected
-    navigate('/settings');
-  };
-
+  
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-      <div className="px-4 py-4 md:px-6 flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-          
-          <div>
-            <h1 className="text-xl font-semibold text-gray-800">{title}</h1>
-          </div>
-        </div>
-        
-        <div className="hidden md:flex items-center w-full max-w-md mx-4">
-          <GlobalSearch />
-        </div>
-        
-        <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5" />
-            <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
-          </Button>
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center space-x-2">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-primary text-white">
-                    {user?.name ? getInitials(user.name) : 'U'}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="hidden md:block text-sm font-medium text-left">
-                  <span>{user?.name}</span>
-                </div>
-                <ChevronDown className="h-4 w-4 text-gray-500" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={navigateToProfile}>Profile</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
+      <Button
+        variant="outline"
+        size="icon"
+        className="md:hidden"
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+      >
+        <Menu className="h-5 w-5" />
+        <span className="sr-only">Toggle menu</span>
+      </Button>
+      
+      <div className="flex-1">
+        <h1 className="text-lg font-semibold md:text-xl">{title}</h1>
+        <p className="text-sm text-muted-foreground">
+          {greeting}, {user?.user_metadata?.first_name || 'User'}
+        </p>
       </div>
       
-      {/* Mobile search - shown only on small screens */}
-      <div className="md:hidden px-4 pb-3">
+      <div className="flex items-center gap-2 md:gap-4">
         <GlobalSearch />
+        
+        <Button variant="ghost" size="icon">
+          <Bell className="h-5 w-5" />
+          <span className="sr-only">Notifications</span>
+        </Button>
+        
+        <Link to="/settings">
+          <Button variant="ghost" size="icon">
+            <Settings className="h-5 w-5" />
+            <span className="sr-only">Settings</span>
+          </Button>
+        </Link>
+        
+        <Button variant="outline" size="sm" onClick={logout}>
+          Sign out
+        </Button>
       </div>
     </header>
   );
