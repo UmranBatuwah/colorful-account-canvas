@@ -38,7 +38,7 @@ export const getTransactions = async (): Promise<Transaction[]> => {
         date: new Date(transaction.date),
         type: transactionType,
         categoryId: transaction.category_id,
-        note: transaction.note,
+        note: transaction.note || '',  // Provide default empty string if note is undefined
         createdAt: new Date(transaction.created_at),
         updatedAt: new Date(transaction.updated_at),
         category: transaction.categories ? {
@@ -95,7 +95,7 @@ export const getTransactionById = async (id: string): Promise<Transaction | unde
       date: new Date(transaction.date),
       type: transactionType,
       categoryId: transaction.category_id,
-      note: transaction.note,
+      note: transaction.note || '',  // Provide default empty string if note is undefined
       createdAt: new Date(transaction.created_at),
       updatedAt: new Date(transaction.updated_at),
       category: transaction.categories ? {
@@ -130,7 +130,7 @@ export const createTransaction = async (transaction: Omit<Transaction, 'id' | 'c
       date: transaction.date.toISOString(), // Convert Date to string for Supabase
       type: transaction.type,
       category_id: transaction.categoryId,
-      note: transaction.note,
+      note: transaction.note || '',  // Include note field with default value
       created_by: user.id // Use created_by instead of user_id
     };
     
@@ -177,7 +177,7 @@ export const createTransaction = async (transaction: Omit<Transaction, 'id' | 'c
       date: new Date(data.date),
       type: transactionType,
       categoryId: data.category_id,
-      note: data.note,
+      note: data.note || '',  // Provide default empty string if note is undefined
       createdAt: new Date(data.created_at),
       updatedAt: new Date(data.updated_at),
       category: data.categories ? {
@@ -272,7 +272,7 @@ export const updateTransaction = async (id: string, transaction: Partial<Transac
       date: new Date(data.date),
       type: transactionType,
       categoryId: data.category_id,
-      note: data.note,
+      note: data.note || '',  // Provide default empty string if note is undefined
       createdAt: new Date(data.created_at),
       updatedAt: new Date(data.updated_at),
       category: data.categories ? {
@@ -369,7 +369,7 @@ export const getTransactionsByType = async (type: 'income' | 'expense'): Promise
         date: new Date(transaction.date),
         type: transactionType,
         categoryId: transaction.category_id,
-        note: transaction.note,
+        note: transaction.note || '',  // Provide default empty string if note is undefined
         createdAt: new Date(transaction.created_at),
         updatedAt: new Date(transaction.updated_at),
         category: transaction.categories ? {
@@ -414,22 +414,30 @@ export const getTransactionsByCategory = async (categoryId: string): Promise<Tra
       return transactions.filter(transaction => transaction.categoryId === categoryId);
     }
 
-    return transactions.map(transaction => ({
-      ...transaction,
-      id: transaction.id,
-      categoryId: transaction.category_id,
-      date: new Date(transaction.date),
-      createdAt: new Date(transaction.created_at),
-      updatedAt: new Date(transaction.updated_at),
-      category: transaction.categories ? {
-        id: transaction.categories.id,
-        name: transaction.categories.name,
-        color: transaction.categories.color,
-        type: transaction.categories.type,
-        description: transaction.categories.description,
-        createdAt: new Date()
-      } : undefined
-    }));
+    return transactions.map(transaction => {
+      // Cast type to TransactionType to ensure it matches our defined types
+      const transactionType = transaction.type as TransactionType;
+      
+      return {
+        id: transaction.id,
+        description: transaction.description || '',
+        amount: Number(transaction.amount),
+        date: new Date(transaction.date),
+        type: transactionType,
+        categoryId: transaction.category_id,
+        note: transaction.note || '',  // Provide default empty string if note is undefined
+        createdAt: new Date(transaction.created_at),
+        updatedAt: new Date(transaction.updated_at),
+        category: transaction.categories ? {
+          id: transaction.categories.id,
+          name: transaction.categories.name,
+          color: transaction.categories.color,
+          type: transaction.categories.type as TransactionType,
+          description: transaction.categories.description,
+          createdAt: new Date()
+        } : undefined
+      };
+    });
   } catch (error) {
     console.error('Error in getTransactionsByCategory:', error);
     // Fall back to local storage
@@ -466,22 +474,30 @@ export const getTransactionsByDateRange = async (startDate: Date, endDate: Date)
       });
     }
 
-    return transactions.map(transaction => ({
-      ...transaction,
-      id: transaction.id,
-      categoryId: transaction.category_id,
-      date: new Date(transaction.date),
-      createdAt: new Date(transaction.created_at),
-      updatedAt: new Date(transaction.updated_at),
-      category: transaction.categories ? {
-        id: transaction.categories.id,
-        name: transaction.categories.name,
-        color: transaction.categories.color,
-        type: transaction.categories.type,
-        description: transaction.categories.description,
-        createdAt: new Date()
-      } : undefined
-    }));
+    return transactions.map(transaction => {
+      // Cast type to TransactionType to ensure it matches our defined types
+      const transactionType = transaction.type as TransactionType;
+      
+      return {
+        id: transaction.id,
+        description: transaction.description || '',
+        amount: Number(transaction.amount),
+        date: new Date(transaction.date),
+        type: transactionType,
+        categoryId: transaction.category_id,
+        note: transaction.note || '',  // Provide default empty string if note is undefined
+        createdAt: new Date(transaction.created_at),
+        updatedAt: new Date(transaction.updated_at),
+        category: transaction.categories ? {
+          id: transaction.categories.id,
+          name: transaction.categories.name,
+          color: transaction.categories.color,
+          type: transaction.categories.type as TransactionType,
+          description: transaction.categories.description,
+          createdAt: new Date()
+        } : undefined
+      };
+    });
   } catch (error) {
     console.error('Error in getTransactionsByDateRange:', error);
     // Fall back to local storage
