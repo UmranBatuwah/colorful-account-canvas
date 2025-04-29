@@ -36,10 +36,6 @@ const DashboardHeader = ({ title }: DashboardHeaderProps) => {
       .toUpperCase();
   };
 
-  const navigateToSettings = () => {
-    navigate('/settings');
-  };
-
   const navigateToProfile = () => {
     // Navigate to settings page with profile tab selected
     navigate('/settings');
@@ -98,7 +94,6 @@ const DashboardHeader = ({ title }: DashboardHeaderProps) => {
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={navigateToProfile}>Profile</DropdownMenuItem>
-              <DropdownMenuItem onClick={navigateToSettings}>Settings</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
             </DropdownMenuContent>
