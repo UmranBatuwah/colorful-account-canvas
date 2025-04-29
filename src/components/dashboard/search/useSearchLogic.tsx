@@ -115,6 +115,7 @@ export const useSearchLogic = () => {
 
   return {
     open,
+    setOpen,
     query,
     results,
     isLoading,

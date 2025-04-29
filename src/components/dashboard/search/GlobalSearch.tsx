@@ -20,6 +20,7 @@ import { useSearchLogic } from './useSearchLogic';
 const GlobalSearch = () => {
   const {
     open,
+    setOpen,
     query,
     results,
     isLoading,
