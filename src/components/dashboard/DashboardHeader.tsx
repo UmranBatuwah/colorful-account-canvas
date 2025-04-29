@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { Menu, Bell, Search, ChevronDown } from 'lucide-react';
+import { Menu, Bell, ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +13,7 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import GlobalSearch from './GlobalSearch';
 
 interface DashboardHeaderProps {
   title: string;
@@ -60,14 +61,7 @@ const DashboardHeader = ({ title }: DashboardHeaderProps) => {
         </div>
         
         <div className="hidden md:flex items-center w-1/3">
-          <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search..."
-              className="w-full py-2 pl-10 pr-4 rounded-full bg-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            />
-          </div>
+          <GlobalSearch />
         </div>
         
         <div className="flex items-center space-x-4">
