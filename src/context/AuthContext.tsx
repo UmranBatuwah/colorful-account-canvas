@@ -86,12 +86,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signup = async (email: string, password: string, name: string) => {
     try {
+      // Update to properly structure user metadata for the profiles trigger
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            first_name: name
+            first_name: name,
+            // Make sure role is properly handled by the database trigger
+            // The trigger will determine if this is the first user (admin) or not (user)
           }
         }
       });
