@@ -1,3 +1,4 @@
+
 import { Category } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
@@ -24,7 +25,7 @@ export const getCategories = async (): Promise<Category[]> => {
       name: category.name,
       description: category.description || undefined,
       color: category.color || '#3B82F6',
-      type: category.type || 'expense', // Ensure type property is set
+      type: category.type || 'expense', // Use the type from the database or default to 'expense'
       createdAt: new Date(category.created_at),
     }));
   } catch (error) {
@@ -57,7 +58,7 @@ export const getCategoryById = async (id: string): Promise<Category | undefined>
       name: category.name,
       description: category.description || undefined,
       color: category.color || '#3B82F6',
-      type: category.type || 'expense', // Ensure type property is set
+      type: category.type || 'expense', // Use the type from the database or default to 'expense'
       createdAt: new Date(category.created_at),
     };
   } catch (error) {
@@ -244,7 +245,7 @@ export const getCategoriesByType = async (type: 'income' | 'expense'): Promise<C
       name: category.name,
       description: category.description || undefined,
       color: category.color || '#3B82F6',
-      type: category.type || 'expense', // Ensure type property is set
+      type: category.type || type, // Ensure type property is set with the provided type
       createdAt: new Date(category.created_at),
     }));
   } catch (error) {

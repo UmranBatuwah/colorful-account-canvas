@@ -14,9 +14,28 @@ export interface SearchResult {
   date?: string;
 }
 
+// Cache for search results
+let searchCache: {
+  query: string;
+  results: SearchResult[];
+  timestamp: number;
+} | null = null;
+
+// Clear search cache
+export const clearSearchCache = () => {
+  searchCache = null;
+};
+
 // Search all data
 export const searchAll = async (query: string): Promise<SearchResult[]> => {
   if (!query) return [];
+  
+  // Check if we have a recent cache for this query
+  if (searchCache && 
+      searchCache.query === query && 
+      (Date.now() - searchCache.timestamp) < 60000) { // Cache valid for 1 minute
+    return searchCache.results;
+  }
   
   const lowercaseQuery = query.toLowerCase();
   const results: SearchResult[] = [];
@@ -81,6 +100,12 @@ export const searchAll = async (query: string): Promise<SearchResult[]> => {
   
   results.push(...invoiceResults);
   
-  // Sort results by relevance
+  // Update cache
+  searchCache = {
+    query,
+    results,
+    timestamp: Date.now()
+  };
+  
   return results;
 };
