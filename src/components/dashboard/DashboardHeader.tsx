@@ -13,7 +13,7 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import GlobalSearch from './GlobalSearch';
+import GlobalSearch from './search/GlobalSearch';
 
 interface DashboardHeaderProps {
   title: string;
@@ -56,39 +56,6 @@ const DashboardHeader = ({ title }: DashboardHeaderProps) => {
     // Navigate to settings page with profile tab selected
     navigate('/settings');
   };
-
-  // Add style tag for highlight effect
-  useEffect(() => {
-    // Add highlight styles if they don't exist
-    if (!document.getElementById('search-highlight-styles')) {
-      const styleEl = document.createElement('style');
-      styleEl.id = 'search-highlight-styles';
-      styleEl.innerHTML = `
-        .search-highlight {
-          background-color: rgba(251, 191, 36, 0.2) !important;
-          box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.5);
-          transition: background-color 0.3s ease;
-        }
-        .search-highlight.animate-pulse {
-          animation: highlight-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        @keyframes highlight-pulse {
-          0%, 100% {
-            background-color: rgba(251, 191, 36, 0.2);
-          }
-          50% {
-            background-color: rgba(251, 191, 36, 0.5);
-          }
-        }
-      `;
-      document.head.appendChild(styleEl);
-    }
-    
-    // Cleanup function
-    return () => {
-      // We don't remove the style element on unmount as it might be needed by other components
-    };
-  }, []);
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
@@ -152,4 +119,3 @@ const DashboardHeader = ({ title }: DashboardHeaderProps) => {
 };
 
 export default DashboardHeader;
-
