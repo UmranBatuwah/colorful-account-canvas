@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { useLocation } from 'react-router-dom';
 import { Transaction } from '@/types';
 import { 
   getTransactions, 
@@ -9,6 +10,7 @@ import {
   deleteTransaction 
 } from '@/services/transactions';
 import { getCategories } from '@/services/categories';
+import { clearSearchCache } from '@/services/search';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import TransactionList from '@/components/transactions/TransactionList';
 import TransactionForm from '@/components/transactions/TransactionForm';
@@ -22,6 +24,7 @@ const Transactions = () => {
   const [isAddingTransaction, setIsAddingTransaction] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const location = useLocation();
   
   useEffect(() => {
     // Load transactions and categories
@@ -36,6 +39,22 @@ const Transactions = () => {
     loadData();
   }, []);
   
+  // Effect for highlighting from URL parameters
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const highlightId = searchParams.get('id');
+    
+    if (highlightId) {
+      // Scroll to the transaction after a small delay to ensure rendering
+      setTimeout(() => {
+        const element = document.getElementById(highlightId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    }
+  }, [location.search, transactions]);
+  
   const handleAddTransaction = async (data: any) => {
     setIsSubmitting(true);
     
@@ -43,6 +62,9 @@ const Transactions = () => {
       const newTransaction = await createTransaction(data);
       
       setTransactions([...transactions, newTransaction]);
+      
+      // Clear search cache when adding new data
+      clearSearchCache();
       
       toast({
         title: 'Transaction added',
@@ -71,6 +93,9 @@ const Transactions = () => {
         )
       );
       
+      // Clear search cache when editing data
+      clearSearchCache();
+      
       toast({
         title: 'Transaction updated',
         description: 'Your transaction has been updated successfully',
@@ -95,6 +120,9 @@ const Transactions = () => {
       setTransactions((prevTransactions) =>
         prevTransactions.filter((t) => t.id !== id)
       );
+      
+      // Clear search cache when deleting data
+      clearSearchCache();
       
       toast({
         title: 'Transaction deleted',

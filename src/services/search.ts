@@ -15,12 +15,39 @@ export interface SearchResult {
   relevance: number; // For better sorting
 }
 
+// Create a memoized results cache to improve performance on repeated searches
+let cachedResults: { [key: string]: SearchResult[] } = {};
+let lastSearch = '';
+
 export const searchAll = (query: string): SearchResult[] => {
   if (!query || query.trim() === '') {
     return [];
   }
 
   const normalizedQuery = query.toLowerCase().trim();
+  
+  // Check cache for exact match first for instant results
+  if (cachedResults[normalizedQuery]) {
+    return cachedResults[normalizedQuery];
+  }
+  
+  // Check if this is just extending the previous search query (typing more letters)
+  // If so, we can filter the previous results instead of searching everything again
+  if (normalizedQuery.startsWith(lastSearch) && lastSearch.length > 0) {
+    const filteredResults = cachedResults[lastSearch].filter(result => {
+      const titleMatch = result.title.toLowerCase().includes(normalizedQuery);
+      const descriptionMatch = result.description?.toLowerCase().includes(normalizedQuery);
+      return titleMatch || descriptionMatch;
+    });
+    
+    // Update cache and last search
+    cachedResults[normalizedQuery] = filteredResults;
+    lastSearch = normalizedQuery;
+    
+    return filteredResults;
+  }
+  
+  // Full search when needed
   const queryTerms = normalizedQuery.split(/\s+/);
   const results: SearchResult[] = [];
 
@@ -117,5 +144,16 @@ export const searchAll = (query: string): SearchResult[] => {
 
   // Sort results by relevance (highest first)
   results.sort((a, b) => b.relevance - a.relevance);
+  
+  // Update cache and last search term
+  cachedResults[normalizedQuery] = results.slice(0, 10); // Limit to 10 results
+  lastSearch = normalizedQuery;
+  
   return results.slice(0, 10); // Limit to 10 results
+};
+
+// Function to clear the cache if needed (e.g., after data changes)
+export const clearSearchCache = () => {
+  cachedResults = {};
+  lastSearch = '';
 };

@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
+import { useLocation } from 'react-router-dom';
 import { ArrowUpRight, ArrowDownRight, Edit2, Trash, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -59,6 +60,7 @@ const TransactionList = ({
   const [currentTransaction, setCurrentTransaction] = useState<Transaction | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
+  const location = useLocation();
 
   // Load all categories
   useEffect(() => {
@@ -69,6 +71,23 @@ const TransactionList = ({
     
     loadCategories();
   }, []);
+
+  // Check for highlighted transaction ID from URL
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const highlightId = searchParams.get('id');
+    
+    if (highlightId) {
+      // If there's an ID in the URL, ensure that transaction is visible
+      const transaction = transactions.find(t => t.id === highlightId);
+      if (transaction) {
+        // Auto-select the transaction type filter if needed
+        if (filterType !== 'all' && transaction.type !== filterType) {
+          setFilterType(transaction.type);
+        }
+      }
+    }
+  }, [location.search, transactions, filterType]);
 
   // Apply filters when dependencies change
   useEffect(() => {
@@ -147,6 +166,13 @@ const TransactionList = ({
     return category?.color || '#ccc';
   };
 
+  // Check if a transaction should be highlighted
+  const shouldHighlight = (transaction: Transaction) => {
+    const searchParams = new URLSearchParams(location.search);
+    const highlightId = searchParams.get('id');
+    return highlightId === transaction.id;
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-4 justify-between">
@@ -186,8 +212,15 @@ const TransactionList = ({
           </TableHeader>
           <TableBody>
             {filteredTransactions.length > 0 ? (
-              filteredTransactions.map((transaction) => (
-                <TableRow key={transaction.id}>
+              filteredTransactions.map((transaction) => {
+                const isHighlighted = shouldHighlight(transaction);
+                return (
+                <TableRow 
+                  key={transaction.id} 
+                  data-id={transaction.id}
+                  id={transaction.id}
+                  className={isHighlighted ? 'search-highlight bg-amber-50' : ''}
+                >
                   <TableCell className="font-medium">
                     {transaction.description}
                   </TableCell>
@@ -252,7 +285,7 @@ const TransactionList = ({
                     </div>
                   </TableCell>
                 </TableRow>
-              ))
+              )})
             ) : (
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-6 text-gray-500">

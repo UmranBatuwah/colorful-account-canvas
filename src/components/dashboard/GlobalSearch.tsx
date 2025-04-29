@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Search, X, FileText, Tag, DollarSign, Loader2, Calendar } from 'lucide-react';
 import { 
   Command, 
@@ -33,12 +33,79 @@ const GlobalSearch = () => {
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Use a ref to track the latest query for debounce handling
+  const latestQueryRef = useRef<string>('');
+  
+  // Get any potential highlight ID from the URL
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const highlightId = searchParams.get('id');
+    
+    if (highlightId) {
+      // Add a slight delay to ensure the element is in the DOM
+      setTimeout(() => {
+        highlightElement(highlightId);
+      }, 100);
+    }
+    
+    // Cleanup highlight when navigating away
+    return () => {
+      removeHighlights();
+    };
+  }, [location]);
+  
+  // Remove any existing highlights
+  const removeHighlights = () => {
+    const highlightedElements = document.querySelectorAll('.search-highlight');
+    highlightedElements.forEach(el => {
+      el.classList.remove('search-highlight', 'animate-pulse');
+    });
+  };
+  
+  // Add highlight to element with the matching ID
+  const highlightElement = (id: string) => {
+    removeHighlights();
+    
+    // Find elements with the ID or containing the ID (for nested elements)
+    const elements = [
+      document.getElementById(id),
+      ...Array.from(document.querySelectorAll(`[data-id="${id}"]`))
+    ].filter(Boolean) as HTMLElement[];
+    
+    if (elements.length > 0) {
+      elements.forEach(el => {
+        // Add highlight class and scroll into view
+        el.classList.add('search-highlight', 'animate-pulse');
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    }
+  };
   
   useEffect(() => {
-    // Debounce search to avoid excessive processing
+    // Update the ref immediately for accurate debounce checks
+    latestQueryRef.current = query;
+    
+    // Set loading state immediately when typing starts
+    if (query) {
+      setIsLoading(true);
+    }
+    
+    // Immediate search for short queries (1-2 chars) for better responsiveness
+    if (query && query.length <= 2) {
+      const quickResults = searchAll(query);
+      const filteredResults = activeFilter === 'all' 
+        ? quickResults 
+        : quickResults.filter(result => result.type === activeFilter);
+      
+      setResults(filteredResults);
+      setIsLoading(false);
+    }
+    
+    // Use a shorter debounce time for better responsiveness
     const handler = setTimeout(() => {
-      if (query) {
-        setIsLoading(true);
+      if (query && query === latestQueryRef.current && query.length > 2) {
         const searchResults = searchAll(query);
         
         // Filter results based on active filter
@@ -48,10 +115,11 @@ const GlobalSearch = () => {
         
         setResults(filteredResults);
         setIsLoading(false);
-      } else {
+      } else if (!query) {
         setResults([]);
+        setIsLoading(false);
       }
-    }, 300);
+    }, 150); // Reduced from 300ms to 150ms for more responsiveness
 
     return () => clearTimeout(handler);
   }, [query, activeFilter]);
@@ -66,7 +134,7 @@ const GlobalSearch = () => {
     setOpen(false);
     setQuery('');
     
-    // Navigate based on result type
+    // Navigate based on result type and pass ID for highlighting
     switch (result.type) {
       case 'transaction':
         navigate(`/transactions?id=${result.id}`);
@@ -130,7 +198,7 @@ const GlobalSearch = () => {
     <div className="relative w-full md:w-80 lg:w-96">
       <Popover open={open} onOpenChange={handleOpenChange}>
         <PopoverTrigger asChild>
-          <button className="relative w-full flex items-center">
+          <button className="search-trigger relative w-full flex items-center">
             <div className="relative w-full focus-within:ring-2 focus-within:ring-primary/30 rounded-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
@@ -157,6 +225,7 @@ const GlobalSearch = () => {
                 onValueChange={setQuery}
                 ref={inputRef}
                 className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                autoFocus
               />
               {query && (
                 <Button 
