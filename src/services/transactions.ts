@@ -1,5 +1,5 @@
 
-import { Transaction } from '@/types';
+import { Transaction, TransactionType } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
 import { getLocalStorageData, saveTransactionsToLocalStorage } from './mockData';
@@ -27,22 +27,30 @@ export const getTransactions = async (): Promise<Transaction[]> => {
       return transactions;
     }
 
-    return transactions.map(transaction => ({
-      ...transaction,
-      id: transaction.id,
-      categoryId: transaction.category_id,
-      date: new Date(transaction.date),
-      createdAt: new Date(transaction.created_at),
-      updatedAt: new Date(transaction.updated_at),
-      category: transaction.categories ? {
-        id: transaction.categories.id,
-        name: transaction.categories.name,
-        color: transaction.categories.color,
-        type: transaction.categories.type,
-        description: transaction.categories.description,
-        createdAt: new Date()
-      } : undefined
-    }));
+    return transactions.map(transaction => {
+      // Cast type to TransactionType to ensure it matches our defined types
+      const transactionType = transaction.type as TransactionType;
+      
+      return {
+        id: transaction.id,
+        description: transaction.description || '',
+        amount: Number(transaction.amount),
+        date: new Date(transaction.date),
+        type: transactionType,
+        categoryId: transaction.category_id,
+        note: transaction.note,
+        createdAt: new Date(transaction.created_at),
+        updatedAt: new Date(transaction.updated_at),
+        category: transaction.categories ? {
+          id: transaction.categories.id,
+          name: transaction.categories.name,
+          color: transaction.categories.color,
+          type: transaction.categories.type as TransactionType,
+          description: transaction.categories.description,
+          createdAt: new Date()
+        } : undefined
+      };
+    });
   } catch (error) {
     console.error('Error in getTransactions:', error);
     // Fall back to local storage
@@ -77,17 +85,24 @@ export const getTransactionById = async (id: string): Promise<Transaction | unde
 
     if (!transaction) return undefined;
 
+    // Cast type to TransactionType to ensure it matches our defined types
+    const transactionType = transaction.type as TransactionType;
+
     return {
-      ...transaction,
-      categoryId: transaction.category_id,
+      id: transaction.id,
+      description: transaction.description || '',
+      amount: Number(transaction.amount),
       date: new Date(transaction.date),
+      type: transactionType,
+      categoryId: transaction.category_id,
+      note: transaction.note,
       createdAt: new Date(transaction.created_at),
       updatedAt: new Date(transaction.updated_at),
       category: transaction.categories ? {
         id: transaction.categories.id,
         name: transaction.categories.name,
         color: transaction.categories.color,
-        type: transaction.categories.type,
+        type: transaction.categories.type as TransactionType,
         description: transaction.categories.description,
         createdAt: new Date()
       } : undefined
@@ -112,11 +127,11 @@ export const createTransaction = async (transaction: Omit<Transaction, 'id' | 'c
     const newTransaction = {
       description: transaction.description,
       amount: transaction.amount,
-      date: transaction.date,
+      date: transaction.date.toISOString(), // Convert Date to string for Supabase
       type: transaction.type,
       category_id: transaction.categoryId,
       note: transaction.note,
-      user_id: user.id
+      created_by: user.id // Use created_by instead of user_id
     };
     
     const { data, error } = await supabase
@@ -152,18 +167,24 @@ export const createTransaction = async (transaction: Omit<Transaction, 'id' | 'c
       return localNewTransaction;
     }
 
+    // Cast type to TransactionType to ensure it matches our defined types
+    const transactionType = data.type as TransactionType;
+
     return {
-      ...data,
       id: data.id,
-      categoryId: data.category_id,
+      description: data.description || '',
+      amount: Number(data.amount),
       date: new Date(data.date),
+      type: transactionType,
+      categoryId: data.category_id,
+      note: data.note,
       createdAt: new Date(data.created_at),
       updatedAt: new Date(data.updated_at),
       category: data.categories ? {
         id: data.categories.id,
         name: data.categories.name,
         color: data.categories.color,
-        type: data.categories.type,
+        type: data.categories.type as TransactionType,
         description: data.categories.description,
         createdAt: new Date()
       } : undefined
@@ -192,10 +213,14 @@ export const updateTransaction = async (id: string, transaction: Partial<Transac
     // Map to the database column names and remove properties that should not be updated directly
     const { id: _, createdAt: __, updatedAt: ___, category: ____, categoryId, ...rest } = transaction;
     
-    const updateData = {
-      ...rest,
-      category_id: categoryId
+    // Create an object with the correct types for Supabase
+    const updateData: any = {
+      ...rest
     };
+    
+    // Handle special cases
+    if (categoryId) updateData.category_id = categoryId;
+    if (transaction.date) updateData.date = transaction.date.toISOString();
     
     const { data, error } = await supabase
       .from('transactions')
@@ -237,18 +262,24 @@ export const updateTransaction = async (id: string, transaction: Partial<Transac
       return updatedTransaction;
     }
 
+    // Cast type to TransactionType to ensure it matches our defined types
+    const transactionType = data.type as TransactionType;
+
     return {
-      ...data,
       id: data.id,
-      categoryId: data.category_id,
+      description: data.description || '',
+      amount: Number(data.amount),
       date: new Date(data.date),
+      type: transactionType,
+      categoryId: data.category_id,
+      note: data.note,
       createdAt: new Date(data.created_at),
       updatedAt: new Date(data.updated_at),
       category: data.categories ? {
         id: data.categories.id,
         name: data.categories.name,
         color: data.categories.color,
-        type: data.categories.type,
+        type: data.categories.type as TransactionType,
         description: data.categories.description,
         createdAt: new Date()
       } : undefined
@@ -327,22 +358,30 @@ export const getTransactionsByType = async (type: 'income' | 'expense'): Promise
       return transactions.filter(transaction => transaction.type === type);
     }
 
-    return transactions.map(transaction => ({
-      ...transaction,
-      id: transaction.id,
-      categoryId: transaction.category_id,
-      date: new Date(transaction.date),
-      createdAt: new Date(transaction.created_at),
-      updatedAt: new Date(transaction.updated_at),
-      category: transaction.categories ? {
-        id: transaction.categories.id,
-        name: transaction.categories.name,
-        color: transaction.categories.color,
-        type: transaction.categories.type,
-        description: transaction.categories.description,
-        createdAt: new Date()
-      } : undefined
-    }));
+    return transactions.map(transaction => {
+      // Cast type to TransactionType to ensure it matches our defined types
+      const transactionType = transaction.type as TransactionType;
+      
+      return {
+        id: transaction.id,
+        description: transaction.description || '',
+        amount: Number(transaction.amount),
+        date: new Date(transaction.date),
+        type: transactionType,
+        categoryId: transaction.category_id,
+        note: transaction.note,
+        createdAt: new Date(transaction.created_at),
+        updatedAt: new Date(transaction.updated_at),
+        category: transaction.categories ? {
+          id: transaction.categories.id,
+          name: transaction.categories.name,
+          color: transaction.categories.color,
+          type: transaction.categories.type as TransactionType,
+          description: transaction.categories.description,
+          createdAt: new Date()
+        } : undefined
+      };
+    });
   } catch (error) {
     console.error('Error in getTransactionsByType:', error);
     // Fall back to local storage

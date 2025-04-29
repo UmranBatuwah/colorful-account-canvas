@@ -25,7 +25,7 @@ export const getCategories = async (): Promise<Category[]> => {
       name: category.name,
       description: category.description || undefined,
       color: category.color || '#3B82F6',
-      type: category.type || 'expense', // Use the type from the database or default to 'expense'
+      type: category.type || 'expense', // Now the type is available from the database
       createdAt: new Date(category.created_at),
     }));
   } catch (error) {
@@ -58,7 +58,7 @@ export const getCategoryById = async (id: string): Promise<Category | undefined>
       name: category.name,
       description: category.description || undefined,
       color: category.color || '#3B82F6',
-      type: category.type || 'expense', // Use the type from the database or default to 'expense'
+      type: category.type || 'expense', // Now the type is available from the database
       createdAt: new Date(category.created_at),
     };
   } catch (error) {
@@ -81,7 +81,7 @@ export const createCategory = async (category: Omit<Category, 'id' | 'createdAt'
     const newCategory = {
       ...category,
       user_id: user.id,
-      type: category.type // Ensure type is included here
+      type: category.type // Make sure type is included
     };
     
     const { data, error } = await supabase
@@ -112,7 +112,7 @@ export const createCategory = async (category: Omit<Category, 'id' | 'createdAt'
       name: data.name,
       description: data.description || undefined,
       color: data.color || '#3B82F6',
-      type: data.type || 'expense', // Ensure type property is set
+      type: data.type || 'expense', // Now the type is available from the database
       createdAt: new Date(data.created_at),
     };
   } catch (error) {
@@ -173,7 +173,7 @@ export const updateCategory = async (id: string, category: Partial<Category>): P
       name: data.name,
       description: data.description || undefined,
       color: data.color || '#3B82F6',
-      type: data.type || 'expense', // Ensure type property is set
+      type: data.type || 'expense', // Now the type is available from the database
       createdAt: new Date(data.created_at),
     };
   } catch (error) {
@@ -245,7 +245,7 @@ export const getCategoriesByType = async (type: 'income' | 'expense'): Promise<C
       name: category.name,
       description: category.description || undefined,
       color: category.color || '#3B82F6',
-      type: category.type || type, // Ensure type property is set with the provided type
+      type: category.type || type, // Now the type is available from the database
       createdAt: new Date(category.created_at),
     }));
   } catch (error) {
