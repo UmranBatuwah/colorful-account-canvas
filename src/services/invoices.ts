@@ -132,9 +132,9 @@ export const getInvoices = async (): Promise<Invoice[]> => {
       return invoices ? JSON.parse(invoices) : [];
     }
     
-    // Get invoices from Supabase
+    // Using any type to bypass the type checking for the table that may not be in the types definition yet
     const { data: invoices, error } = await supabase
-      .from('invoices')
+      .from('invoices' as any)
       .select('*')
       .order('created_at', { ascending: false });
     
@@ -148,9 +148,10 @@ export const getInvoices = async (): Promise<Invoice[]> => {
     
     // Get invoice items for each invoice
     const invoiceWithItems = await Promise.all(
-      invoices.map(async (invoice) => {
+      invoices.map(async (invoice: any) => {
+        // Using any type to bypass the type checking for the table that may not be in the types definition yet
         const { data: items, error: itemsError } = await supabase
-          .from('invoice_items')
+          .from('invoice_items' as any)
           .select('*')
           .eq('invoice_id', invoice.id);
         
@@ -158,28 +159,40 @@ export const getInvoices = async (): Promise<Invoice[]> => {
           console.error('Error fetching invoice items:', itemsError);
           return {
             ...invoice,
-            issue_date: new Date(invoice.issue_date),
-            due_date: new Date(invoice.due_date),
-            created_at: new Date(invoice.created_at),
-            updated_at: new Date(invoice.updated_at),
+            id: invoice.id,
+            invoiceNumber: invoice.invoice_number,
+            customerName: invoice.customer_name,
+            customerEmail: invoice.customer_email,
+            issueDate: new Date(invoice.issue_date),
+            dueDate: new Date(invoice.due_date),
+            createdAt: new Date(invoice.created_at),
+            updatedAt: new Date(invoice.updated_at),
             items: []
           };
         }
         
         return {
-          ...invoice,
+          id: invoice.id,
           invoiceNumber: invoice.invoice_number,
+          customerName: invoice.customer_name,
+          customerEmail: invoice.customer_email,
           issueDate: new Date(invoice.issue_date),
           dueDate: new Date(invoice.due_date),
+          subtotal: parseFloat(invoice.subtotal),
+          taxRate: parseFloat(invoice.tax_rate),
+          taxAmount: parseFloat(invoice.tax_amount),
+          total: parseFloat(invoice.total),
+          notes: invoice.notes,
+          status: invoice.status,
           createdAt: new Date(invoice.created_at),
           updatedAt: new Date(invoice.updated_at),
-          items: items.map(item => ({
+          items: items ? items.map((item: any) => ({
             id: item.id,
             description: item.description,
             quantity: parseFloat(item.quantity),
             unitPrice: parseFloat(item.unit_price),
             amount: parseFloat(item.amount)
-          }))
+          })) : []
         };
       })
     );
@@ -197,8 +210,9 @@ export const getInvoices = async (): Promise<Invoice[]> => {
 // Get invoice by ID
 export const getInvoiceById = async (id: string): Promise<Invoice | undefined> => {
   try {
+    // Using any type to bypass the type checking for the table that may not be in the types definition yet
     const { data: invoice, error } = await supabase
-      .from('invoices')
+      .from('invoices' as any)
       .select('*')
       .eq('id', id)
       .single();
@@ -215,18 +229,27 @@ export const getInvoiceById = async (id: string): Promise<Invoice | undefined> =
     if (!invoice) return undefined;
     
     // Get items for this invoice
+    // Using any type to bypass the type checking for the table that may not be in the types definition yet
     const { data: items, error: itemsError } = await supabase
-      .from('invoice_items')
+      .from('invoice_items' as any)
       .select('*')
       .eq('invoice_id', id);
     
     if (itemsError) {
       console.error('Error fetching invoice items:', itemsError);
       return {
-        ...invoice,
+        id: invoice.id,
         invoiceNumber: invoice.invoice_number,
+        customerName: invoice.customer_name,
+        customerEmail: invoice.customer_email,
         issueDate: new Date(invoice.issue_date),
         dueDate: new Date(invoice.due_date),
+        subtotal: parseFloat(invoice.subtotal),
+        taxRate: parseFloat(invoice.tax_rate),
+        taxAmount: parseFloat(invoice.tax_amount),
+        total: parseFloat(invoice.total),
+        notes: invoice.notes,
+        status: invoice.status,
         createdAt: new Date(invoice.created_at),
         updatedAt: new Date(invoice.updated_at),
         items: []
@@ -234,19 +257,27 @@ export const getInvoiceById = async (id: string): Promise<Invoice | undefined> =
     }
     
     return {
-      ...invoice,
+      id: invoice.id,
       invoiceNumber: invoice.invoice_number,
+      customerName: invoice.customer_name,
+      customerEmail: invoice.customer_email,
       issueDate: new Date(invoice.issue_date),
       dueDate: new Date(invoice.due_date),
+      subtotal: parseFloat(invoice.subtotal),
+      taxRate: parseFloat(invoice.tax_rate),
+      taxAmount: parseFloat(invoice.tax_amount),
+      total: parseFloat(invoice.total),
+      notes: invoice.notes,
+      status: invoice.status,
       createdAt: new Date(invoice.created_at),
       updatedAt: new Date(invoice.updated_at),
-      items: items.map(item => ({
+      items: items ? items.map((item: any) => ({
         id: item.id,
         description: item.description,
         quantity: parseFloat(item.quantity),
         unitPrice: parseFloat(item.unit_price),
         amount: parseFloat(item.amount)
-      }))
+      })) : []
     };
   } catch (error) {
     console.error('Error in getInvoiceById:', error);

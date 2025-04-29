@@ -25,7 +25,8 @@ export const getCategories = async (): Promise<Category[]> => {
       name: category.name,
       description: category.description || undefined,
       color: category.color || '#3B82F6',
-      type: category.type as 'income' | 'expense', // Make sure the type field is included
+      // Ensure type is set with default to 'expense' if not available
+      type: category.type as 'income' | 'expense' || 'expense',
       createdAt: new Date(category.created_at),
     }));
   } catch (error) {
@@ -58,7 +59,8 @@ export const getCategoryById = async (id: string): Promise<Category | undefined>
       name: category.name,
       description: category.description || undefined,
       color: category.color || '#3B82F6',
-      type: category.type as 'income' | 'expense', // Make sure the type field is included
+      // Ensure type is set with default to 'expense' if not available
+      type: category.type as 'income' | 'expense' || 'expense',
       createdAt: new Date(category.created_at),
     };
   } catch (error) {
@@ -107,7 +109,11 @@ export const createCategory = async (category: Omit<Category, 'id' | 'createdAt'
     }
 
     return {
-      ...data,
+      id: data.id,
+      name: data.name,
+      description: data.description || undefined,
+      color: data.color || '#3B82F6',
+      type: data.type as 'income' | 'expense',
       createdAt: new Date(data.created_at),
     };
   } catch (error) {
@@ -164,7 +170,11 @@ export const updateCategory = async (id: string, category: Partial<Category>): P
     }
 
     return {
-      ...data,
+      id: data.id,
+      name: data.name,
+      description: data.description || undefined,
+      color: data.color || '#3B82F6',
+      type: data.type as 'income' | 'expense',
       createdAt: new Date(data.created_at),
     };
   } catch (error) {
@@ -236,7 +246,7 @@ export const getCategoriesByType = async (type: 'income' | 'expense'): Promise<C
       name: category.name,
       description: category.description || undefined,
       color: category.color || '#3B82F6',
-      type: category.type as 'income' | 'expense', // Make sure the type field is included
+      type: category.type as 'income' | 'expense',
       createdAt: new Date(category.created_at),
     }));
   } catch (error) {

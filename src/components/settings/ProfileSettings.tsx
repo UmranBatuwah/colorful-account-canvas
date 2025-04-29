@@ -78,6 +78,14 @@ const ProfileSettings = () => {
     }
   };
   
+  // Get initials for avatar fallback
+  const getInitials = () => {
+    if (firstName && lastName) {
+      return `${firstName.charAt(0)}${lastName.charAt(0)}`;
+    }
+    return 'U'; // Default to 'U' for User if no name available
+  };
+  
   return (
     <Card>
       <CardHeader>
@@ -93,7 +101,7 @@ const ProfileSettings = () => {
               <Avatar className="h-24 w-24">
                 <AvatarImage src={user?.user_metadata?.avatar_url || ''} />
                 <AvatarFallback className="text-lg">
-                  {`${firstName.charAt(0)}${lastName.charAt(0)}` || 'U'}
+                  {getInitials()}
                 </AvatarFallback>
               </Avatar>
               <div className="flex gap-2">

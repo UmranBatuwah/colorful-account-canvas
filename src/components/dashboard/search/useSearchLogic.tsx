@@ -27,6 +27,8 @@ export const useSearchLogic = () => {
     if (query && query.length <= 2) {
       const performSearch = async () => {
         const searchResults = await searchAll(query);
+        
+        // Filter results based on active filter - now properly awaiting the results
         const filteredResults = activeFilter === 'all' 
           ? searchResults 
           : searchResults.filter(result => result.type === activeFilter);
@@ -44,7 +46,7 @@ export const useSearchLogic = () => {
         const performSearch = async () => {
           const searchResults = await searchAll(query);
           
-          // Filter results based on active filter
+          // Filter results based on active filter - now properly awaiting the results
           const filteredResults = activeFilter === 'all' 
             ? searchResults 
             : searchResults.filter(result => result.type === activeFilter);

@@ -68,7 +68,7 @@ const Invoices = () => {
   const handleCreateInvoice = async (data: Omit<Invoice, "id" | "invoiceNumber" | "createdAt" | "updatedAt">) => {
     try {
       const newInvoice = await createInvoice(data);
-      setInvoices([newInvoice, ...invoices]);
+      setInvoices(prevInvoices => [newInvoice, ...prevInvoices]);
       setCurrentInvoice(newInvoice);
       setViewMode("view");
       toast({
@@ -88,7 +88,9 @@ const Invoices = () => {
   const handleUpdateInvoice = async (data: Invoice) => {
     try {
       const updatedInvoice = await updateInvoice(data);
-      setInvoices(invoices.map(inv => inv.id === updatedInvoice.id ? updatedInvoice : inv));
+      setInvoices(prevInvoices => 
+        prevInvoices.map(inv => inv.id === updatedInvoice.id ? updatedInvoice : inv)
+      );
       setCurrentInvoice(updatedInvoice);
       setViewMode("view");
       toast({
