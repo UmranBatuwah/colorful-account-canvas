@@ -36,10 +36,14 @@ const ProfileSettings = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   
+  // Get user metadata for first and last name
+  const firstName = user?.user_metadata?.first_name || '';
+  const lastName = user?.user_metadata?.last_name || '';
+  
   // Default values based on the current user
   const defaultValues: Partial<ProfileFormValues> = {
-    firstName: user?.name?.split(' ')[0] || '',
-    lastName: user?.name?.split(' ')[1] || '',
+    firstName,
+    lastName,
     email: user?.email || '',
     bio: '',
     company: '',
@@ -87,10 +91,9 @@ const ProfileSettings = () => {
           <div className="flex flex-col items-center sm:flex-row sm:items-start gap-4">
             <div className="flex flex-col items-center gap-2">
               <Avatar className="h-24 w-24">
-                {/* Fixed: Changed avatar_url to match the User type in AuthContext */}
-                <AvatarImage src={''} />
+                <AvatarImage src={user?.user_metadata?.avatar_url || ''} />
                 <AvatarFallback className="text-lg">
-                  {user?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
+                  {`${firstName.charAt(0)}${lastName.charAt(0)}` || 'U'}
                 </AvatarFallback>
               </Avatar>
               <div className="flex gap-2">

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import DashboardSidebar from './DashboardSidebar';
 import DashboardHeader from './DashboardHeader';
-import { initializeLocalStorage } from '@/services/mockData';
+import { initializeSupabaseData } from '@/integrations/supabase/client';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -15,9 +15,9 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
   const { isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
   
-  // Initialize mock data in local storage
+  // Initialize data from Supabase or mock data
   useEffect(() => {
-    initializeLocalStorage();
+    initializeSupabaseData();
   }, []);
   
   // Check if user is authenticated

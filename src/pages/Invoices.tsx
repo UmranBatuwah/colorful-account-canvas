@@ -18,14 +18,26 @@ const Invoices = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [currentInvoice, setCurrentInvoice] = useState<Invoice | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("list");
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
 
   // Load invoices
   useEffect(() => {
-    const loadInvoices = () => {
-      const data = getInvoices();
-      setInvoices(data);
+    const loadInvoices = async () => {
+      try {
+        const data = await getInvoices();
+        setInvoices(data);
+      } catch (error) {
+        console.error("Error loading invoices:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load invoices. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     loadInvoices();
@@ -37,34 +49,60 @@ const Invoices = () => {
     const invoiceId = params.get("id");
     
     if (invoiceId) {
-      const invoice = getInvoiceById(invoiceId);
-      if (invoice) {
-        setCurrentInvoice(invoice);
-        setViewMode("view");
-      }
+      const fetchInvoice = async () => {
+        try {
+          const invoice = await getInvoiceById(invoiceId);
+          if (invoice) {
+            setCurrentInvoice(invoice);
+            setViewMode("view");
+          }
+        } catch (error) {
+          console.error("Error fetching invoice:", error);
+        }
+      };
+      
+      fetchInvoice();
     }
   }, [location.search]);
 
-  const handleCreateInvoice = (data: Omit<Invoice, "id" | "invoiceNumber" | "createdAt" | "updatedAt">) => {
-    const newInvoice = createInvoice(data);
-    setInvoices([newInvoice, ...invoices]);
-    setCurrentInvoice(newInvoice);
-    setViewMode("view");
-    toast({
-      title: "Invoice created",
-      description: "Your invoice has been created successfully.",
-    });
+  const handleCreateInvoice = async (data: Omit<Invoice, "id" | "invoiceNumber" | "createdAt" | "updatedAt">) => {
+    try {
+      const newInvoice = await createInvoice(data);
+      setInvoices([newInvoice, ...invoices]);
+      setCurrentInvoice(newInvoice);
+      setViewMode("view");
+      toast({
+        title: "Invoice created",
+        description: "Your invoice has been created successfully.",
+      });
+    } catch (error) {
+      console.error("Error creating invoice:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create invoice. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleUpdateInvoice = (data: Invoice) => {
-    const updatedInvoice = updateInvoice(data);
-    setInvoices(invoices.map(inv => inv.id === updatedInvoice.id ? updatedInvoice : inv));
-    setCurrentInvoice(updatedInvoice);
-    setViewMode("view");
-    toast({
-      title: "Invoice updated",
-      description: "Your invoice has been updated successfully.",
-    });
+  const handleUpdateInvoice = async (data: Invoice) => {
+    try {
+      const updatedInvoice = await updateInvoice(data);
+      setInvoices(invoices.map(inv => inv.id === updatedInvoice.id ? updatedInvoice : inv));
+      setCurrentInvoice(updatedInvoice);
+      setViewMode("view");
+      toast({
+        title: "Invoice updated",
+        description: "Your invoice has been updated successfully.",
+      });
+    } catch (error) {
+      console.error("Error updating invoice:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update invoice. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleEditInvoice = (id: string) => {
@@ -93,7 +131,11 @@ const Invoices = () => {
 
   return (
     <DashboardLayout title="Invoices">
-      {viewMode === "list" && (
+      {isLoading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      ) : viewMode === "list" ? (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold">Invoices</h1>
@@ -107,9 +149,7 @@ const Invoices = () => {
             onEdit={handleEditInvoice}
           />
         </div>
-      )}
-
-      {viewMode === "create" && (
+      ) : viewMode === "create" ? (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold">Create Invoice</h1>
@@ -119,9 +159,7 @@ const Invoices = () => {
             onCancel={handleBack}
           />
         </div>
-      )}
-
-      {viewMode === "edit" && currentInvoice && (
+      ) : viewMode === "edit" && currentInvoice ? (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold">Edit Invoice</h1>
@@ -132,15 +170,13 @@ const Invoices = () => {
             onCancel={handleBack}
           />
         </div>
-      )}
-
-      {viewMode === "view" && currentInvoice && (
+      ) : viewMode === "view" && currentInvoice ? (
         <InvoiceDetail 
           invoice={currentInvoice} 
           onEdit={() => setViewMode("edit")}
           onBack={handleBack}
         />
-      )}
+      ) : null}
     </DashboardLayout>
   );
 };

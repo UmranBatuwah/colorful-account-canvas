@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { searchAll, SearchResult } from '@/services/search';
@@ -26,27 +25,35 @@ export const useSearchLogic = () => {
     
     // Immediate search for short queries (1-2 chars) for better responsiveness
     if (query && query.length <= 2) {
-      const quickResults = searchAll(query);
-      const filteredResults = activeFilter === 'all' 
-        ? quickResults 
-        : quickResults.filter(result => result.type === activeFilter);
-      
-      setResults(filteredResults);
-      setIsLoading(false);
-    }
-    
-    // Use a shorter debounce time for better responsiveness
-    const handler = setTimeout(() => {
-      if (query && query === latestQueryRef.current && query.length > 2) {
-        const searchResults = searchAll(query);
-        
-        // Filter results based on active filter
+      const performSearch = async () => {
+        const searchResults = await searchAll(query);
         const filteredResults = activeFilter === 'all' 
           ? searchResults 
           : searchResults.filter(result => result.type === activeFilter);
         
         setResults(filteredResults);
         setIsLoading(false);
+      };
+      
+      performSearch();
+    }
+    
+    // Use a shorter debounce time for better responsiveness
+    const handler = setTimeout(() => {
+      if (query && query === latestQueryRef.current && query.length > 2) {
+        const performSearch = async () => {
+          const searchResults = await searchAll(query);
+          
+          // Filter results based on active filter
+          const filteredResults = activeFilter === 'all' 
+            ? searchResults 
+            : searchResults.filter(result => result.type === activeFilter);
+          
+          setResults(filteredResults);
+          setIsLoading(false);
+        };
+        
+        performSearch();
       } else if (!query) {
         setResults([]);
         setIsLoading(false);

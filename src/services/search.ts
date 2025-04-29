@@ -35,36 +35,24 @@ const loadSearchData = async () => {
     // Try to get user session
     const { data: { session } } = await supabase.auth.getSession();
     
-    if (session) {
-      // If authenticated, get data from Supabase
-      // These functions already have Supabase implementation with local storage fallback
-      const [transactions, categories, invoices] = await Promise.all([
-        getTransactions(),
-        getCategories(),
-        getInvoices()
-      ]);
-      
-      cachedResults = {
-        transactions,
-        categories, 
-        invoices
-      };
-    } else {
-      // Get mock data from local storage
-      const transactions = await getTransactions();
-      const categories = await getCategories();
-      const invoices = await getInvoices();
-      
-      cachedResults = {
-        transactions,
-        categories,
-        invoices
-      };
-    }
+    // Get data through service functions
+    // These functions already have Supabase implementation with local storage fallback
+    const [transactions, categories, invoices] = await Promise.all([
+      getTransactions(),
+      getCategories(),
+      getInvoices()
+    ]);
+    
+    cachedResults = {
+      transactions,
+      categories, 
+      invoices
+    };
     
     return cachedResults;
   } catch (error) {
     console.error('Error loading search data:', error);
+    // Fall back to local storage sources
     const transactions = await getTransactions();
     const categories = await getCategories();
     const invoices = await getInvoices();

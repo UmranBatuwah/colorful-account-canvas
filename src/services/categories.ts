@@ -21,7 +21,11 @@ export const getCategories = async (): Promise<Category[]> => {
 
     // Transform categories to match the application's format
     return categories.map(category => ({
-      ...category,
+      id: category.id,
+      name: category.name,
+      description: category.description || undefined,
+      color: category.color || '#3B82F6',
+      type: category.type as 'income' | 'expense', // Make sure the type field is included
       createdAt: new Date(category.created_at),
     }));
   } catch (error) {
@@ -50,7 +54,11 @@ export const getCategoryById = async (id: string): Promise<Category | undefined>
     if (!category) return undefined;
 
     return {
-      ...category,
+      id: category.id,
+      name: category.name,
+      description: category.description || undefined,
+      color: category.color || '#3B82F6',
+      type: category.type as 'income' | 'expense', // Make sure the type field is included
       createdAt: new Date(category.created_at),
     };
   } catch (error) {
@@ -224,7 +232,11 @@ export const getCategoriesByType = async (type: 'income' | 'expense'): Promise<C
     }
 
     return categories.map(category => ({
-      ...category,
+      id: category.id,
+      name: category.name,
+      description: category.description || undefined,
+      color: category.color || '#3B82F6',
+      type: category.type as 'income' | 'expense', // Make sure the type field is included
       createdAt: new Date(category.created_at),
     }));
   } catch (error) {
