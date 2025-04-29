@@ -38,7 +38,7 @@ export const getTransactions = async (): Promise<Transaction[]> => {
         date: new Date(transaction.date),
         type: transactionType,
         categoryId: transaction.category_id,
-        note: transaction.note || '',  // Provide default empty string if note is undefined
+        note: transaction.note || '',  // Use the note column or default to empty string
         createdAt: new Date(transaction.created_at),
         updatedAt: new Date(transaction.updated_at),
         category: transaction.categories ? {
@@ -95,7 +95,7 @@ export const getTransactionById = async (id: string): Promise<Transaction | unde
       date: new Date(transaction.date),
       type: transactionType,
       categoryId: transaction.category_id,
-      note: transaction.note || '',  // Provide default empty string if note is undefined
+      note: transaction.note || '',  // Use the note column or default to empty string
       createdAt: new Date(transaction.created_at),
       updatedAt: new Date(transaction.updated_at),
       category: transaction.categories ? {
@@ -177,7 +177,7 @@ export const createTransaction = async (transaction: Omit<Transaction, 'id' | 'c
       date: new Date(data.date),
       type: transactionType,
       categoryId: data.category_id,
-      note: data.note || '',  // Provide default empty string if note is undefined
+      note: data.note || '',  // Use the note column or default to empty string
       createdAt: new Date(data.created_at),
       updatedAt: new Date(data.updated_at),
       category: data.categories ? {
@@ -272,7 +272,7 @@ export const updateTransaction = async (id: string, transaction: Partial<Transac
       date: new Date(data.date),
       type: transactionType,
       categoryId: data.category_id,
-      note: data.note || '',  // Provide default empty string if note is undefined
+      note: data.note || '',  // Use the note column or default to empty string
       createdAt: new Date(data.created_at),
       updatedAt: new Date(data.updated_at),
       category: data.categories ? {
@@ -369,7 +369,7 @@ export const getTransactionsByType = async (type: 'income' | 'expense'): Promise
         date: new Date(transaction.date),
         type: transactionType,
         categoryId: transaction.category_id,
-        note: transaction.note || '',  // Provide default empty string if note is undefined
+        note: transaction.note || '',  // Use the note column or default to empty string
         createdAt: new Date(transaction.created_at),
         updatedAt: new Date(transaction.updated_at),
         category: transaction.categories ? {
@@ -425,7 +425,7 @@ export const getTransactionsByCategory = async (categoryId: string): Promise<Tra
         date: new Date(transaction.date),
         type: transactionType,
         categoryId: transaction.category_id,
-        note: transaction.note || '',  // Provide default empty string if note is undefined
+        note: transaction.note || '',  // Use the note column or default to empty string
         createdAt: new Date(transaction.created_at),
         updatedAt: new Date(transaction.updated_at),
         category: transaction.categories ? {
@@ -485,7 +485,7 @@ export const getTransactionsByDateRange = async (startDate: Date, endDate: Date)
         date: new Date(transaction.date),
         type: transactionType,
         categoryId: transaction.category_id,
-        note: transaction.note || '',  // Provide default empty string if note is undefined
+        note: transaction.note || '',  // Use the note column or default to empty string
         createdAt: new Date(transaction.created_at),
         updatedAt: new Date(transaction.updated_at),
         category: transaction.categories ? {
