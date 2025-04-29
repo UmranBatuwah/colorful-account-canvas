@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Menu, Bell, ChevronDown } from 'lucide-react';
 import {
@@ -23,6 +23,21 @@ const DashboardHeader = ({ title }: DashboardHeaderProps) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Add keyboard shortcut for search (Cmd+K or Ctrl+K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        document.querySelector<HTMLElement>('.search-trigger')?.click();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -60,7 +75,7 @@ const DashboardHeader = ({ title }: DashboardHeaderProps) => {
           </div>
         </div>
         
-        <div className="hidden md:flex items-center w-1/3">
+        <div className="hidden md:flex items-center w-full max-w-md mx-4">
           <GlobalSearch />
         </div>
         
@@ -93,6 +108,11 @@ const DashboardHeader = ({ title }: DashboardHeaderProps) => {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+      </div>
+      
+      {/* Mobile search - shown only on small screens */}
+      <div className="md:hidden px-4 pb-3">
+        <GlobalSearch />
       </div>
     </header>
   );
