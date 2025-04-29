@@ -39,15 +39,15 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-// Initialize Supabase data
-useEffect(() => {
-  initializeSupabaseData();
-}, []);
-
 const queryClient = new QueryClient();
 
 const AppRoutes = () => {
   const { isAuthenticated, isLoading } = useAuth();
+  
+  // Initialize Supabase data
+  useEffect(() => {
+    initializeSupabaseData();
+  }, []);
   
   // Auto-redirect authenticated users away from auth pages
   const AuthRouteGuard = ({ children }: { children: React.ReactNode }) => {
@@ -120,6 +120,11 @@ const AppRoutes = () => {
 };
 
 const App = () => {
+  // Initialize Supabase data in the App component
+  useEffect(() => {
+    initializeSupabaseData();
+  }, []);
+  
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
