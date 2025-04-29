@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { searchAll, SearchResult } from '@/services/search';
@@ -28,7 +29,7 @@ export const useSearchLogic = () => {
       const performSearch = async () => {
         const searchResults = await searchAll(query);
         
-        // Filter results based on active filter - now properly awaiting the results
+        // Filter results based on active filter - properly await the results first
         const filteredResults = activeFilter === 'all' 
           ? searchResults 
           : searchResults.filter(result => result.type === activeFilter);
@@ -46,7 +47,7 @@ export const useSearchLogic = () => {
         const performSearch = async () => {
           const searchResults = await searchAll(query);
           
-          // Filter results based on active filter - now properly awaiting the results
+          // Filter results based on active filter - properly await the results first
           const filteredResults = activeFilter === 'all' 
             ? searchResults 
             : searchResults.filter(result => result.type === activeFilter);

@@ -1,4 +1,3 @@
-
 import { Invoice, InvoiceItem, InvoiceStatus } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
@@ -132,13 +131,13 @@ export const getInvoices = async (): Promise<Invoice[]> => {
       return invoices ? JSON.parse(invoices) : [];
     }
     
-    // Using any type to bypass the type checking for the table that may not be in the types definition yet
+    // Use a type cast since the table might not be in the type definitions
     const { data: invoices, error } = await supabase
-      .from('invoices' as any)
+      .from('invoices')
       .select('*')
       .order('created_at', { ascending: false });
     
-    if (error) {
+    if (error || !invoices) {
       console.error('Error fetching invoices:', error);
       // Fall back to local storage
       initializeInvoices();
@@ -149,16 +148,14 @@ export const getInvoices = async (): Promise<Invoice[]> => {
     // Get invoice items for each invoice
     const invoiceWithItems = await Promise.all(
       invoices.map(async (invoice: any) => {
-        // Using any type to bypass the type checking for the table that may not be in the types definition yet
         const { data: items, error: itemsError } = await supabase
-          .from('invoice_items' as any)
+          .from('invoice_items')
           .select('*')
           .eq('invoice_id', invoice.id);
         
         if (itemsError) {
           console.error('Error fetching invoice items:', itemsError);
           return {
-            ...invoice,
             id: invoice.id,
             invoiceNumber: invoice.invoice_number,
             customerName: invoice.customer_name,
@@ -167,7 +164,13 @@ export const getInvoices = async (): Promise<Invoice[]> => {
             dueDate: new Date(invoice.due_date),
             createdAt: new Date(invoice.created_at),
             updatedAt: new Date(invoice.updated_at),
-            items: []
+            items: [],
+            subtotal: parseFloat(invoice.subtotal || 0),
+            taxRate: parseFloat(invoice.tax_rate || 0),
+            taxAmount: parseFloat(invoice.tax_amount || 0),
+            total: parseFloat(invoice.total || 0),
+            notes: invoice.notes || '',
+            status: invoice.status || 'draft'
           };
         }
         
@@ -178,12 +181,12 @@ export const getInvoices = async (): Promise<Invoice[]> => {
           customerEmail: invoice.customer_email,
           issueDate: new Date(invoice.issue_date),
           dueDate: new Date(invoice.due_date),
-          subtotal: parseFloat(invoice.subtotal),
-          taxRate: parseFloat(invoice.tax_rate),
-          taxAmount: parseFloat(invoice.tax_amount),
-          total: parseFloat(invoice.total),
-          notes: invoice.notes,
-          status: invoice.status,
+          subtotal: parseFloat(invoice.subtotal || 0),
+          taxRate: parseFloat(invoice.tax_rate || 0),
+          taxAmount: parseFloat(invoice.tax_amount || 0),
+          total: parseFloat(invoice.total || 0),
+          notes: invoice.notes || '',
+          status: invoice.status || 'draft',
           createdAt: new Date(invoice.created_at),
           updatedAt: new Date(invoice.updated_at),
           items: items ? items.map((item: any) => ({
@@ -210,14 +213,14 @@ export const getInvoices = async (): Promise<Invoice[]> => {
 // Get invoice by ID
 export const getInvoiceById = async (id: string): Promise<Invoice | undefined> => {
   try {
-    // Using any type to bypass the type checking for the table that may not be in the types definition yet
+    // Use a type cast since the table might not be in the type definitions
     const { data: invoice, error } = await supabase
-      .from('invoices' as any)
+      .from('invoices')
       .select('*')
       .eq('id', id)
       .single();
     
-    if (error) {
+    if (error || !invoice) {
       console.error('Error fetching invoice by ID:', error);
       // Fall back to local storage
       initializeInvoices();
@@ -226,12 +229,9 @@ export const getInvoiceById = async (id: string): Promise<Invoice | undefined> =
       return parsedInvoices.find((invoice: Invoice) => invoice.id === id);
     }
     
-    if (!invoice) return undefined;
-    
     // Get items for this invoice
-    // Using any type to bypass the type checking for the table that may not be in the types definition yet
     const { data: items, error: itemsError } = await supabase
-      .from('invoice_items' as any)
+      .from('invoice_items')
       .select('*')
       .eq('invoice_id', id);
     
@@ -244,12 +244,12 @@ export const getInvoiceById = async (id: string): Promise<Invoice | undefined> =
         customerEmail: invoice.customer_email,
         issueDate: new Date(invoice.issue_date),
         dueDate: new Date(invoice.due_date),
-        subtotal: parseFloat(invoice.subtotal),
-        taxRate: parseFloat(invoice.tax_rate),
-        taxAmount: parseFloat(invoice.tax_amount),
-        total: parseFloat(invoice.total),
-        notes: invoice.notes,
-        status: invoice.status,
+        subtotal: parseFloat(invoice.subtotal || 0),
+        taxRate: parseFloat(invoice.tax_rate || 0),
+        taxAmount: parseFloat(invoice.tax_amount || 0),
+        total: parseFloat(invoice.total || 0),
+        notes: invoice.notes || '',
+        status: invoice.status || 'draft',
         createdAt: new Date(invoice.created_at),
         updatedAt: new Date(invoice.updated_at),
         items: []
@@ -263,12 +263,12 @@ export const getInvoiceById = async (id: string): Promise<Invoice | undefined> =
       customerEmail: invoice.customer_email,
       issueDate: new Date(invoice.issue_date),
       dueDate: new Date(invoice.due_date),
-      subtotal: parseFloat(invoice.subtotal),
-      taxRate: parseFloat(invoice.tax_rate),
-      taxAmount: parseFloat(invoice.tax_amount),
-      total: parseFloat(invoice.total),
-      notes: invoice.notes,
-      status: invoice.status,
+      subtotal: parseFloat(invoice.subtotal || 0),
+      taxRate: parseFloat(invoice.tax_rate || 0),
+      taxAmount: parseFloat(invoice.tax_amount || 0),
+      total: parseFloat(invoice.total || 0),
+      notes: invoice.notes || '',
+      status: invoice.status || 'draft',
       createdAt: new Date(invoice.created_at),
       updatedAt: new Date(invoice.updated_at),
       items: items ? items.map((item: any) => ({

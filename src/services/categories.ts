@@ -1,4 +1,3 @@
-
 import { Category } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
@@ -25,8 +24,7 @@ export const getCategories = async (): Promise<Category[]> => {
       name: category.name,
       description: category.description || undefined,
       color: category.color || '#3B82F6',
-      // Ensure type is set with default to 'expense' if not available
-      type: category.type as 'income' | 'expense' || 'expense',
+      type: category.type || 'expense', // Ensure type property is set
       createdAt: new Date(category.created_at),
     }));
   } catch (error) {
@@ -59,8 +57,7 @@ export const getCategoryById = async (id: string): Promise<Category | undefined>
       name: category.name,
       description: category.description || undefined,
       color: category.color || '#3B82F6',
-      // Ensure type is set with default to 'expense' if not available
-      type: category.type as 'income' | 'expense' || 'expense',
+      type: category.type || 'expense', // Ensure type property is set
       createdAt: new Date(category.created_at),
     };
   } catch (error) {
@@ -83,6 +80,7 @@ export const createCategory = async (category: Omit<Category, 'id' | 'createdAt'
     const newCategory = {
       ...category,
       user_id: user.id,
+      type: category.type // Ensure type is included here
     };
     
     const { data, error } = await supabase
@@ -113,7 +111,7 @@ export const createCategory = async (category: Omit<Category, 'id' | 'createdAt'
       name: data.name,
       description: data.description || undefined,
       color: data.color || '#3B82F6',
-      type: data.type as 'income' | 'expense',
+      type: data.type || 'expense', // Ensure type property is set
       createdAt: new Date(data.created_at),
     };
   } catch (error) {
@@ -174,7 +172,7 @@ export const updateCategory = async (id: string, category: Partial<Category>): P
       name: data.name,
       description: data.description || undefined,
       color: data.color || '#3B82F6',
-      type: data.type as 'income' | 'expense',
+      type: data.type || 'expense', // Ensure type property is set
       createdAt: new Date(data.created_at),
     };
   } catch (error) {
@@ -246,7 +244,7 @@ export const getCategoriesByType = async (type: 'income' | 'expense'): Promise<C
       name: category.name,
       description: category.description || undefined,
       color: category.color || '#3B82F6',
-      type: category.type as 'income' | 'expense',
+      type: category.type || 'expense', // Ensure type property is set
       createdAt: new Date(category.created_at),
     }));
   } catch (error) {
