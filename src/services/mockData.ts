@@ -1,4 +1,3 @@
-
 import { Transaction, Category, FinancialSummary, MonthlyData } from '@/types';
 
 // Empty mock data for initialization
@@ -23,13 +22,9 @@ const LOCAL_STORAGE_KEYS = {
 
 // Initialize local storage with empty arrays
 export const initializeLocalStorage = () => {
-  if (!localStorage.getItem(LOCAL_STORAGE_KEYS.TRANSACTIONS)) {
-    localStorage.setItem(LOCAL_STORAGE_KEYS.TRANSACTIONS, JSON.stringify([]));
-  }
-  
-  if (!localStorage.getItem(LOCAL_STORAGE_KEYS.CATEGORIES)) {
-    localStorage.setItem(LOCAL_STORAGE_KEYS.CATEGORIES, JSON.stringify([]));
-  }
+  // Clear existing data instead of initializing with defaults
+  localStorage.setItem(LOCAL_STORAGE_KEYS.TRANSACTIONS, JSON.stringify([]));
+  localStorage.setItem(LOCAL_STORAGE_KEYS.CATEGORIES, JSON.stringify([]));
 };
 
 // Get all data from local storage

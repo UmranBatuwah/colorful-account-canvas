@@ -19,110 +19,17 @@ const generateInvoiceNumber = (): string => {
   return `${prefix}-${timestamp}${random}`;
 };
 
-// Sample mock data
-const mockInvoices: Invoice[] = [
-  {
-    id: uuidv4(),
-    invoiceNumber: 'INV-231001',
-    customerName: 'Acme Corporation',
-    customerEmail: 'billing@acmecorp.com',
-    issueDate: new Date(2023, 9, 1),
-    dueDate: new Date(2023, 9, 15),
-    items: [
-      {
-        id: uuidv4(),
-        description: 'Web Development Services',
-        quantity: 40,
-        unitPrice: 85,
-        amount: 3400,
-      },
-      {
-        id: uuidv4(),
-        description: 'UI/UX Design',
-        quantity: 20,
-        unitPrice: 95,
-        amount: 1900,
-      },
-    ],
-    subtotal: 5300,
-    taxRate: 10,
-    taxAmount: 530,
-    total: 5830,
-    notes: 'Thank you for your business!',
-    status: 'paid',
-    createdAt: new Date(2023, 9, 1),
-    updatedAt: new Date(2023, 9, 1),
-  },
-  {
-    id: uuidv4(),
-    invoiceNumber: 'INV-231002',
-    customerName: 'Globex Industries',
-    customerEmail: 'accounts@globex.com',
-    issueDate: new Date(2023, 9, 5),
-    dueDate: new Date(2023, 10, 5),
-    items: [
-      {
-        id: uuidv4(),
-        description: 'Monthly Maintenance',
-        quantity: 1,
-        unitPrice: 1500,
-        amount: 1500,
-      }
-    ],
-    subtotal: 1500,
-    taxRate: 10,
-    taxAmount: 150,
-    total: 1650,
-    status: 'sent',
-    createdAt: new Date(2023, 9, 5),
-    updatedAt: new Date(2023, 9, 5),
-  },
-  {
-    id: uuidv4(),
-    invoiceNumber: 'INV-231003',
-    customerName: 'TechStart LLC',
-    customerEmail: 'finance@techstart.io',
-    issueDate: new Date(2023, 9, 10),
-    dueDate: new Date(2023, 9, 25),
-    items: [
-      {
-        id: uuidv4(),
-        description: 'API Integration',
-        quantity: 25,
-        unitPrice: 110,
-        amount: 2750,
-      },
-      {
-        id: uuidv4(),
-        description: 'Server Configuration',
-        quantity: 10,
-        unitPrice: 150,
-        amount: 1500,
-      }
-    ],
-    subtotal: 4250,
-    taxRate: 10,
-    taxAmount: 425,
-    total: 4675,
-    notes: 'Net 15 payment terms',
-    status: 'overdue',
-    createdAt: new Date(2023, 9, 10),
-    updatedAt: new Date(2023, 9, 10),
-  }
-];
-
-// Initialize local storage with mock data
+// Initialize local storage with empty data (no mock data)
 const initializeInvoices = (): void => {
   if (!localStorage.getItem('invoices')) {
-    localStorage.setItem('invoices', JSON.stringify(mockInvoices));
+    localStorage.setItem('invoices', JSON.stringify([]));
   }
 };
 
 // Get all invoices
 export const getInvoices = async (): Promise<Invoice[]> => {
   try {
-    // Since we're having issues with the Supabase tables, we'll use local storage
-    // until the database tables are properly created
+    // Initialize with empty data instead of mock data
     initializeInvoices();
     const invoices = localStorage.getItem('invoices');
     return invoices ? JSON.parse(invoices) : [];

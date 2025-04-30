@@ -17,10 +17,10 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
   }
 });
 
-// Initialize services - removed automatic data loading
+// Initialize services - completely removed automatic data loading
 export const initializeSupabaseData = async () => {
   try {
-    // Check if user is authenticated
+    // Only check auth status, don't load any data
     const { data: { session } } = await supabase.auth.getSession();
     
     if (!session) {
@@ -29,6 +29,6 @@ export const initializeSupabaseData = async () => {
       console.log("User authenticated");
     }
   } catch (error) {
-    console.error("Error initializing data:", error);
+    console.error("Error checking authentication:", error);
   }
 };
