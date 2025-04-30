@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import AuthLayout from '@/components/auth/AuthLayout';
-import SignupForm from '@/components/auth/SignupForm';
+import SignupForm from '@/components/auth/signup/SignupForm';
 
 const Signup = () => {
   const { isAuthenticated } = useAuth();
