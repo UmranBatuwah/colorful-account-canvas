@@ -86,8 +86,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signup = async (email: string, password: string, name: string) => {
     try {
-      // Only pass the first_name in user metadata
-      // Don't explicitly set a role - let the database trigger handle it
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -109,6 +107,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       return Promise.resolve();
     } catch (error) {
+      console.error("Signup error:", error);
       toast({
         title: "Signup failed",
         description: error instanceof Error ? error.message : "An unexpected error occurred",
