@@ -11,7 +11,7 @@ import { Plus } from 'lucide-react';
 import { Transaction, FinancialSummary, MonthlyData } from '@/types';
 import { getTransactions, createTransaction } from '@/services/transactions';
 import { getCategories } from '@/services/categories';
-import { calculateFinancialSummary, mockMonthlyData, initializeLocalStorage } from '@/services/mockData';
+import { calculateFinancialSummary, mockMonthlyData } from '@/services/mockData';
 import { useToast } from '@/hooks/use-toast';
 
 const Dashboard = () => {
@@ -23,9 +23,6 @@ const Dashboard = () => {
   const { toast } = useToast();
   
   useEffect(() => {
-    // Initialize local storage with mock data
-    initializeLocalStorage();
-    
     // Load transactions and categories
     const loadData = async () => {
       const fetchedTransactions = await getTransactions();

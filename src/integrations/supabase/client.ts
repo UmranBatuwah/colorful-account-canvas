@@ -17,28 +17,18 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
   }
 });
 
-// Initialize services
-import { initializeLocalStorage } from '@/services/mockData';
-import { getInvoices } from '@/services/invoices';
-
-// Call this function to ensure mock data is loaded
+// Initialize services - removed automatic data loading
 export const initializeSupabaseData = async () => {
   try {
     // Check if user is authenticated
     const { data: { session } } = await supabase.auth.getSession();
     
     if (!session) {
-      // If no authenticated session, fallback to local storage
-      console.log("No authenticated session, using local storage data");
-      initializeLocalStorage();
-      await getInvoices(); // Initialize invoice data
+      console.log("No authenticated session");
     } else {
-      console.log("User authenticated, using Supabase data");
+      console.log("User authenticated");
     }
   } catch (error) {
     console.error("Error initializing data:", error);
-    // Fallback to local storage in case of error
-    initializeLocalStorage();
-    await getInvoices();
   }
 };
