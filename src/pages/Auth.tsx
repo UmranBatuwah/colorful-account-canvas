@@ -12,10 +12,11 @@ import { ArrowLeft, User, Key, Mail } from 'lucide-react';
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const { login, signup } = useAuth();
+  const { login, signup, signupWithGoogle } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -70,6 +71,21 @@ const Auth = () => {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignup = async () => {
+    setIsGoogleLoading(true);
+    try {
+      await signupWithGoogle();
+      // The redirect will happen automatically
+    } catch (error) {
+      toast({
+        title: 'Google signup failed',
+        description: error instanceof Error ? error.message : 'An error occurred during Google signup',
+        variant: 'destructive',
+      });
+      setIsGoogleLoading(false);
     }
   };
 
@@ -138,13 +154,24 @@ const Auth = () => {
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter>
+                <CardFooter className="flex flex-col space-y-4">
                   <Button 
                     type="submit" 
                     className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
                     disabled={isLoading}
                   >
                     {isLoading ? "Logging in..." : "Login"}
+                  </Button>
+                  
+                  <Button 
+                    type="button" 
+                    variant="outline"
+                    className="w-full flex items-center gap-2"
+                    onClick={handleGoogleSignup}
+                    disabled={isGoogleLoading}
+                  >
+                    <Mail className="h-4 w-4" />
+                    {isGoogleLoading ? "Connecting..." : "Sign in with Gmail"}
                   </Button>
                 </CardFooter>
               </form>
@@ -195,13 +222,24 @@ const Auth = () => {
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter>
+                <CardFooter className="flex flex-col space-y-4">
                   <Button 
                     type="submit" 
                     className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
                     disabled={isLoading}
                   >
                     {isLoading ? "Creating account..." : "Sign up"}
+                  </Button>
+                  
+                  <Button 
+                    type="button" 
+                    variant="outline"
+                    className="w-full flex items-center gap-2"
+                    onClick={handleGoogleSignup}
+                    disabled={isGoogleLoading}
+                  >
+                    <Mail className="h-4 w-4" />
+                    {isGoogleLoading ? "Connecting..." : "Sign up with Gmail"}
                   </Button>
                 </CardFooter>
               </form>
