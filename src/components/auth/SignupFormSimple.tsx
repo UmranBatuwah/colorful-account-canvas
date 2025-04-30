@@ -10,11 +10,10 @@ import { User, Mail } from 'lucide-react';
 
 const SignupFormSimple = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { signup, signupWithGoogle } = useAuth();
+  const { signup } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -42,21 +41,6 @@ const SignupFormSimple = () => {
       });
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleGoogleSignup = async () => {
-    setIsGoogleLoading(true);
-    try {
-      await signupWithGoogle();
-      // The redirect will happen automatically
-    } catch (error) {
-      toast({
-        title: 'Google signup failed',
-        description: error instanceof Error ? error.message : 'An error occurred during Google signup',
-        variant: 'destructive',
-      });
-      setIsGoogleLoading(false);
     }
   };
 
@@ -112,17 +96,6 @@ const SignupFormSimple = () => {
           {isLoading ? "Creating account..." : "Sign up"}
         </Button>
       </form>
-      
-      <Button 
-        type="button" 
-        variant="outline"
-        className="w-full flex items-center gap-2"
-        onClick={handleGoogleSignup}
-        disabled={isGoogleLoading}
-      >
-        <Mail className="h-4 w-4" />
-        {isGoogleLoading ? "Connecting..." : "Sign up with Gmail"}
-      </Button>
     </div>
   );
 };
