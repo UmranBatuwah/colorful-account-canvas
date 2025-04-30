@@ -1,93 +1,13 @@
 
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, User, Key, Mail } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import LoginForm from '@/components/auth/LoginForm';
+import SignupFormSimple from '@/components/auth/SignupFormSimple';
+import AuthCard from '@/components/auth/AuthCard';
 
 const Auth = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const { login, signup, signupWithGoogle } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!email || !password) {
-      toast({
-        title: 'Error',
-        description: 'Please fill in all fields',
-        variant: 'destructive',
-      });
-      return;
-    }
-    
-    setIsLoading(true);
-    try {
-      await login(email, password);
-      navigate('/dashboard');
-    } catch (error) {
-      toast({
-        title: 'Login failed',
-        description: error instanceof Error ? error.message : 'Please check your credentials and try again',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!email || !password || !name) {
-      toast({
-        title: 'Error',
-        description: 'Please fill in all fields',
-        variant: 'destructive',
-      });
-      return;
-    }
-    
-    setIsLoading(true);
-    try {
-      await signup(email, password, name);
-      navigate('/dashboard');
-    } catch (error) {
-      toast({
-        title: 'Signup failed',
-        description: error instanceof Error ? error.message : 'Please check your information and try again',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleGoogleSignup = async () => {
-    setIsGoogleLoading(true);
-    try {
-      await signupWithGoogle();
-      // The redirect will happen automatically
-    } catch (error) {
-      toast({
-        title: 'Google signup failed',
-        description: error instanceof Error ? error.message : 'An error occurred during Google signup',
-        variant: 'destructive',
-      });
-      setIsGoogleLoading(false);
-    }
-  };
 
   return (
     <div className="h-screen flex flex-col items-center justify-center bg-gray-50">
@@ -109,143 +29,10 @@ const Auth = () => {
           <p className="text-gray-600 mt-2">Manage your finances efficiently</p>
         </div>
         
-        <Card>
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl text-center">Welcome back</CardTitle>
-            <CardDescription className="text-center">
-              Enter your credentials to access your account
-            </CardDescription>
-          </CardHeader>
-          <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid grid-cols-2 w-full">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="signup">Sign up</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="login">
-              <form onSubmit={handleLogin}>
-                <CardContent className="space-y-4 pt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="Enter your email"
-                        className="pl-10"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
-                    <div className="relative">
-                      <Key className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="password"
-                        type="password"
-                        placeholder="Enter your password"
-                        className="pl-10"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex flex-col space-y-4">
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Logging in..." : "Login"}
-                  </Button>
-                  
-                  <Button 
-                    type="button" 
-                    variant="outline"
-                    className="w-full flex items-center gap-2"
-                    onClick={handleGoogleSignup}
-                    disabled={isGoogleLoading}
-                  >
-                    <Mail className="h-4 w-4" />
-                    {isGoogleLoading ? "Connecting..." : "Sign in with Gmail"}
-                  </Button>
-                </CardFooter>
-              </form>
-            </TabsContent>
-            
-            <TabsContent value="signup">
-              <form onSubmit={handleSignup}>
-                <CardContent className="space-y-4 pt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Name</Label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="name"
-                        placeholder="Enter your name"
-                        className="pl-10"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="signup-email"
-                        type="email"
-                        placeholder="Enter your email"
-                        className="pl-10"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-password">Password</Label>
-                    <div className="relative">
-                      <Key className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="signup-password"
-                        type="password"
-                        placeholder="Create a password"
-                        className="pl-10"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex flex-col space-y-4">
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Creating account..." : "Sign up"}
-                  </Button>
-                  
-                  <Button 
-                    type="button" 
-                    variant="outline"
-                    className="w-full flex items-center gap-2"
-                    onClick={handleGoogleSignup}
-                    disabled={isGoogleLoading}
-                  >
-                    <Mail className="h-4 w-4" />
-                    {isGoogleLoading ? "Connecting..." : "Sign up with Gmail"}
-                  </Button>
-                </CardFooter>
-              </form>
-            </TabsContent>
-          </Tabs>
-        </Card>
+        <AuthCard 
+          loginContent={<LoginForm />} 
+          signupContent={<SignupFormSimple />} 
+        />
       </div>
     </div>
   );
