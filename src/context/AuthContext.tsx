@@ -1,11 +1,10 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Session, User } from "@supabase/supabase-js";
 
-// Define available user roles
+// Define available user roles, now including 'manager'
 export type UserRole = 'admin' | 'manager' | 'user';
 
 type AuthContextType = {
