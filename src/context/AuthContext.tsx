@@ -12,7 +12,6 @@ type AuthContextType = {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string, name: string) => Promise<void>;
-  signupWithGoogle: () => Promise<void>;
   logout: () => void;
 };
 
@@ -27,140 +26,51 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  // Create a mock user to simulate authentication
+  const mockUser = {
+    id: "mock-user-id",
+    email: "user@example.com",
+    user_metadata: { first_name: "Guest" }
+  } as User;
+  
+  const [user, setUser] = useState<User | null>(mockUser);
+  const [session, setSession] = useState<Session | null>({ user: mockUser } as Session);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { toast } = useToast();
   
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (event === 'SIGNED_IN') {
-          toast({
-            title: "Logged in successfully",
-            description: `Welcome back!`,
-          });
-        } else if (event === 'SIGNED_OUT') {
-          toast({
-            title: "Logged out",
-            description: "You have been logged out successfully",
-          });
-        }
-      }
-    );
-    
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setIsLoading(false);
-    });
-    
-    return () => subscription.unsubscribe();
-  }, [toast]);
+    // Skip actual authentication checks
+    setIsLoading(false);
+  }, []);
 
+  // Mock login function - automatically succeeds
   const login = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-      
-      if (error) {
-        throw error;
-      }
-      
-      return Promise.resolve();
-    } catch (error) {
-      toast({
-        title: "Login failed",
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
-        variant: "destructive",
-      });
-      return Promise.reject(error);
-    }
+    return Promise.resolve();
   };
 
+  // Mock signup function - automatically succeeds
   const signup = async (email: string, password: string, name: string) => {
-    try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            first_name: name
-          }
-        }
-      });
-      
-      if (error) {
-        throw error;
-      }
-      
-      toast({
-        title: "Account created successfully",
-        description: `Welcome, ${name}!`,
-      });
-      
-      return Promise.resolve();
-    } catch (error) {
-      console.error("Signup error:", error);
-      toast({
-        title: "Signup failed",
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
-        variant: "destructive",
-      });
-      return Promise.reject(error);
-    }
+    toast({
+      title: "Account created successfully",
+      description: `Welcome, ${name}!`,
+    });
+    return Promise.resolve();
   };
 
-  const signupWithGoogle = async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/dashboard`,
-        }
-      });
-      
-      if (error) {
-        throw error;
-      }
-      
-      return Promise.resolve();
-    } catch (error) {
-      console.error("Google signup error:", error);
-      toast({
-        title: "Google signup failed",
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
-        variant: "destructive",
-      });
-      return Promise.reject(error);
-    }
-  };
-
+  // Mock logout function - does nothing
   const logout = async () => {
-    try {
-      await supabase.auth.signOut();
-    } catch (error) {
-      console.error("Error during logout:", error);
-    }
+    // No actual logout needed
   };
 
   return (
     <AuthContext.Provider
       value={{
-        user,
-        session,
-        isAuthenticated: !!user,
-        isLoading,
+        user: mockUser,
+        session: { user: mockUser } as Session,
+        isAuthenticated: true, // Always authenticated
+        isLoading: false,
         login,
         signup,
-        signupWithGoogle,
         logout,
       }}
     >

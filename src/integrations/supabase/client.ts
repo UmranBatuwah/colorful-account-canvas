@@ -11,24 +11,14 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
-    persistSession: true,
-    autoRefreshToken: true,
+    persistSession: false,
+    autoRefreshToken: false,
     storage: localStorage
   }
 });
 
-// Initialize services - completely removed automatic data loading
+// Initialize services - completely skip authentication checks
 export const initializeSupabaseData = async () => {
-  try {
-    // Only check auth status, don't load any data
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (!session) {
-      console.log("No authenticated session");
-    } else {
-      console.log("User authenticated");
-    }
-  } catch (error) {
-    console.error("Error checking authentication:", error);
-  }
+  console.log("Skipping authentication checks - data will be loaded without authentication");
+  // No authentication checks, no data loading
 };

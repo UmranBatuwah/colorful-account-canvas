@@ -1,7 +1,5 @@
 
 import { ReactNode, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
 import DashboardSidebar from './DashboardSidebar';
 import DashboardHeader from './DashboardHeader';
 import { initializeSupabaseData } from '@/integrations/supabase/client';
@@ -12,28 +10,10 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
-  const { isAuthenticated, isLoading } = useAuth();
-  const navigate = useNavigate();
-  
   // Initialize data from Supabase or mock data
   useEffect(() => {
     initializeSupabaseData();
   }, []);
-  
-  // Check if user is authenticated
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      navigate('/auth');
-    }
-  }, [isAuthenticated, isLoading, navigate]);
-  
-  if (isLoading) {
-    return (
-      <div className="flex h-screen w-screen items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="flex h-screen bg-gray-50">

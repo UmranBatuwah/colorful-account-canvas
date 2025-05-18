@@ -1,28 +1,32 @@
 
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
 import AuthLayout from '@/components/auth/AuthLayout';
 import LoginForm from '@/components/auth/LoginForm';
 
 const Login = () => {
-  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/dashboard');
-    }
-  }, [isAuthenticated, navigate]);
+  // Automatically redirect to dashboard when login button is clicked
+  const handleAutoLogin = () => {
+    navigate('/dashboard');
+  };
 
   return (
     <AuthLayout 
       title="Welcome Back"
-      subtitle="Sign in to continue to your account"
+      subtitle="Click login to continue to the dashboard"
       linkText="Don't have an account? Sign up"
       linkTo="/signup"
     >
-      <LoginForm />
+      <div className="space-y-4">
+        <button 
+          onClick={handleAutoLogin}
+          className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-2 px-4 rounded"
+        >
+          Login to Dashboard
+        </button>
+      </div>
     </AuthLayout>
   );
 };

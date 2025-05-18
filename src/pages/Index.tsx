@@ -1,19 +1,8 @@
 
-import { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/context/AuthContext';
 
 const Index = () => {
-  const { isAuthenticated, isLoading } = useAuth();
-  const navigate = useNavigate();
-  
-  useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      navigate('/dashboard');
-    }
-  }, [isAuthenticated, isLoading, navigate]);
-  
   return (
     <div className="flex min-h-screen flex-col">
       <header className="px-4 lg:px-6 h-16 flex items-center">
@@ -21,8 +10,8 @@ const Index = () => {
           <span className="text-xl font-bold">Finance Manager</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link to="/auth" className="text-sm font-medium hover:underline underline-offset-4">
-            Login
+          <Link to="/dashboard" className="text-sm font-medium hover:underline underline-offset-4">
+            Dashboard
           </Link>
           <Link to="/features" className="text-sm font-medium hover:underline underline-offset-4">
             Features
@@ -48,9 +37,9 @@ const Index = () => {
                 </p>
               </div>
               <div className="flex flex-wrap items-center justify-center gap-4">
-                <Link to="/auth">
+                <Link to="/dashboard">
                   <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600">
-                    Get Started
+                    Go to Dashboard
                   </Button>
                 </Link>
                 <Link to="/features">
