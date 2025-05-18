@@ -17,7 +17,11 @@ import SearchFilters from './SearchFilters';
 import SearchHighlighter from './SearchHighlighter';
 import { useSearchLogic } from './useSearchLogic';
 
-const GlobalSearch = () => {
+interface GlobalSearchProps {
+  onClose?: () => void;
+}
+
+const GlobalSearch = ({ onClose }: GlobalSearchProps = {}) => {
   const {
     open,
     setOpen,
@@ -35,11 +39,19 @@ const GlobalSearch = () => {
     getTypeTitle
   } = useSearchLogic();
 
+  // If an external onClose function is provided, we should call it when the search is closed
+  const handleCloseInternal = (isOpen: boolean) => {
+    handleOpenChange(isOpen);
+    if (!isOpen && onClose) {
+      onClose();
+    }
+  };
+
   return (
     <div className="relative w-full md:w-80 lg:w-96">
       <SearchHighlighter />
       
-      <Popover open={open} onOpenChange={handleOpenChange}>
+      <Popover open={open} onOpenChange={handleCloseInternal}>
         <PopoverTrigger asChild>
           <button className="search-trigger relative w-full flex items-center">
             <div className="relative w-full focus-within:ring-2 focus-within:ring-primary/30 rounded-full">

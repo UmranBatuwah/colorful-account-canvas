@@ -64,7 +64,7 @@ const DashboardHeader = ({ title }: DashboardHeaderProps) => {
         </div>
       </header>
       
-      {isSearchOpen && <GlobalSearch onClose={handleCloseSearch} />}
+      {isSearchOpen && <GlobalSearch />}
     </>
   );
 };
