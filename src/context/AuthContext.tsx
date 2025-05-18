@@ -26,15 +26,20 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  // Create a mock user to simulate authentication
+  // Create a mock user that matches the User type from Supabase
   const mockUser = {
     id: "mock-user-id",
     email: "user@example.com",
-    user_metadata: { first_name: "Guest" }
+    user_metadata: { first_name: "Guest" },
+    app_metadata: {}, // required field
+    aud: "authenticated", // required field
+    created_at: new Date().toISOString(), // required field
+    role: "",
+    updated_at: new Date().toISOString(),
   } as User;
   
   const [user, setUser] = useState<User | null>(mockUser);
-  const [session, setSession] = useState<Session | null>({ user: mockUser } as Session);
+  const [session, setSession] = useState<Session | null>({ user: mockUser, access_token: "mock-token", refresh_token: "mock-refresh-token" } as Session);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { toast } = useToast();
   
@@ -66,7 +71,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     <AuthContext.Provider
       value={{
         user: mockUser,
-        session: { user: mockUser } as Session,
+        session: { user: mockUser, access_token: "mock-token", refresh_token: "mock-refresh-token" } as Session,
         isAuthenticated: true, // Always authenticated
         isLoading: false,
         login,
