@@ -16,6 +16,19 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { z } from 'zod';
+
+// Define an extended schema that includes role
+const signupWithRoleSchema = signupFormSchema.and(
+  z.object({
+    role: z.enum(['admin', 'manager', 'user'] as const)
+  })
+);
+
+// Define the type based on the extended schema
+type SignupFormWithRoleValues = SignupFormValues & { 
+  role: UserRole 
+};
 
 const SignupFormWithRole = () => {
   const { signup } = useAuth();
@@ -23,12 +36,8 @@ const SignupFormWithRole = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
-  const form = useForm<SignupFormValues & { role: UserRole }>({
-    resolver: zodResolver(
-      signupFormSchema.extend({
-        role: z.enum(['admin', 'manager', 'user'])
-      })
-    ),
+  const form = useForm<SignupFormWithRoleValues>({
+    resolver: zodResolver(signupWithRoleSchema),
     defaultValues: {
       name: '',
       email: '',
@@ -38,7 +47,7 @@ const SignupFormWithRole = () => {
     },
   });
 
-  const onSubmit = async (data: SignupFormValues & { role: UserRole }) => {
+  const onSubmit = async (data: SignupFormWithRoleValues) => {
     setIsLoading(true);
     
     try {
@@ -59,7 +68,61 @@ const SignupFormWithRole = () => {
     <div className="space-y-6">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <SignupFormFields form={form} hideSubmitButton />
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Full Name</FormLabel>
+                <FormControl>
+                  <input {...field} className="w-full px-3 py-2 border rounded" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <input {...field} type="email" className="w-full px-3 py-2 border rounded" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <input {...field} type="password" className="w-full px-3 py-2 border rounded" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="confirmPassword"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Confirm Password</FormLabel>
+                <FormControl>
+                  <input {...field} type="password" className="w-full px-3 py-2 border rounded" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           
           <FormField
             control={form.control}
@@ -96,8 +159,5 @@ const SignupFormWithRole = () => {
     </div>
   );
 };
-
-// Import the z object at the top
-import { z } from 'zod';
 
 export default SignupFormWithRole;

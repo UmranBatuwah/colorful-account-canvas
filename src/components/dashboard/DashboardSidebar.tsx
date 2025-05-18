@@ -4,7 +4,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { Home, BarChart2, PieChart, FilePlus, Database, CreditCard, Tag, Settings, ChevronLeft, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth, UserRole } from '@/context/AuthContext';
 import RoleBasedAccess from '@/components/auth/RoleBasedAccess';
 
 const DashboardSidebar = () => {
@@ -17,31 +17,31 @@ const DashboardSidebar = () => {
       title: 'Dashboard',
       icon: Home,
       path: '/dashboard',
-      allowedRoles: ['admin', 'manager', 'user'],
+      allowedRoles: ['admin', 'manager', 'user'] as UserRole[],
     },
     {
       title: 'Transactions',
       icon: CreditCard,
       path: '/transactions',
-      allowedRoles: ['admin', 'manager', 'user'],
+      allowedRoles: ['admin', 'manager', 'user'] as UserRole[],
     },
     {
       title: 'Categories',
       icon: Tag,
       path: '/categories',
-      allowedRoles: ['admin', 'manager'],
+      allowedRoles: ['admin', 'manager'] as UserRole[],
     },
     {
       title: 'Invoices',
       icon: FileText,
       path: '/invoices',
-      allowedRoles: ['admin', 'manager'],
+      allowedRoles: ['admin', 'manager'] as UserRole[],
     },
     {
       title: 'Reports',
       icon: BarChart2,
       path: '/reports',
-      allowedRoles: ['admin', 'manager', 'user'],
+      allowedRoles: ['admin', 'manager', 'user'] as UserRole[],
     },
   ];
 

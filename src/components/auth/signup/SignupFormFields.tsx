@@ -7,13 +7,16 @@ import { SignupFormValues } from './schema';
 
 interface SignupFormFieldsProps {
   form: UseFormReturn<SignupFormValues>;
-  isLoading: boolean;
-  onSubmit: (data: SignupFormValues) => Promise<void>;
+  isLoading?: boolean;
+  onSubmit?: (data: SignupFormValues) => Promise<void>;
+  hideSubmitButton?: boolean;
 }
 
-const SignupFormFields = ({ form, isLoading, onSubmit }: SignupFormFieldsProps) => {
+const SignupFormFields = ({ form, isLoading = false, onSubmit, hideSubmitButton = false }: SignupFormFieldsProps) => {
+  const handleSubmit = onSubmit ? form.handleSubmit(onSubmit) : undefined;
+
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <FormField
         control={form.control}
         name="name"
@@ -92,13 +95,15 @@ const SignupFormFields = ({ form, isLoading, onSubmit }: SignupFormFieldsProps) 
         )}
       />
       
-      <Button 
-        type="submit" 
-        className="w-full h-11 mt-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium"
-        disabled={isLoading}
-      >
-        {isLoading ? 'Creating Account...' : 'Create Account'}
-      </Button>
+      {!hideSubmitButton && (
+        <Button 
+          type="submit" 
+          className="w-full h-11 mt-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium"
+          disabled={isLoading}
+        >
+          {isLoading ? 'Creating Account...' : 'Create Account'}
+        </Button>
+      )}
     </form>
   );
 };
