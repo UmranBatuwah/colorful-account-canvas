@@ -5,13 +5,18 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Session, User } from "@supabase/supabase-js";
 
+// Define available user roles
+export type UserRole = 'admin' | 'manager' | 'user';
+
 type AuthContextType = {
   user: User | null;
   session: Session | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  userRole: UserRole;
+  hasAccess: (requiredRoles: UserRole[]) => boolean;
   login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string, name: string) => Promise<void>;
+  signup: (email: string, password: string, name: string, role?: UserRole) => Promise<void>;
   logout: () => void;
 };
 
@@ -30,7 +35,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const mockUser = {
     id: "mock-user-id",
     email: "user@example.com",
-    user_metadata: { first_name: "Guest" },
+    user_metadata: { first_name: "Guest", role: 'admin' },
     app_metadata: {}, // required field
     aud: "authenticated", // required field
     created_at: new Date().toISOString(), // required field
@@ -41,6 +46,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(mockUser);
   const [session, setSession] = useState<Session | null>({ user: mockUser, access_token: "mock-token", refresh_token: "mock-refresh-token" } as Session);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [userRole, setUserRole] = useState<UserRole>('admin');
   const { toast } = useToast();
   
   useEffect(() => {
@@ -48,18 +54,46 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(false);
   }, []);
 
-  // Mock login function - automatically succeeds
-  const login = async (email: string, password: string) => {
-    return Promise.resolve();
+  // Function to check if user has required role access
+  const hasAccess = (requiredRoles: UserRole[]): boolean => {
+    if (!requiredRoles.length) return true;
+    return requiredRoles.includes(userRole);
   };
 
-  // Mock signup function - automatically succeeds
-  const signup = async (email: string, password: string, name: string) => {
-    toast({
-      title: "Account created successfully",
-      description: `Welcome, ${name}!`,
-    });
-    return Promise.resolve();
+  // Mock login function - automatically succeeds
+  const login = async (email: string, password: string) => {
+    setIsLoading(true);
+    try {
+      // In a real app, this would verify credentials and set the correct role
+      const role = email.includes('admin') ? 'admin' : 
+                  email.includes('manager') ? 'manager' : 'user';
+      setUserRole(role as UserRole);
+      
+      toast({
+        title: "Login successful",
+        description: `Welcome back, ${role}!`,
+      });
+      return Promise.resolve();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Mock signup function with role assignment
+  const signup = async (email: string, password: string, name: string, role: UserRole = 'user') => {
+    setIsLoading(true);
+    try {
+      // In a real app, this would register the user with the specified role
+      setUserRole(role);
+      
+      toast({
+        title: "Account created successfully",
+        description: `Welcome, ${name}! You have been assigned the role: ${role}`,
+      });
+      return Promise.resolve();
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Mock logout function - does nothing
@@ -73,7 +107,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         user: mockUser,
         session: { user: mockUser, access_token: "mock-token", refresh_token: "mock-refresh-token" } as Session,
         isAuthenticated: true, // Always authenticated
-        isLoading: false,
+        isLoading,
+        userRole,
+        hasAccess,
         login,
         signup,
         logout,

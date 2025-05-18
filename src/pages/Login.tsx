@@ -1,25 +1,26 @@
 
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import AuthLayout from '@/components/auth/AuthLayout';
+import LoginForm from '@/components/auth/LoginForm';
 
 const Login = () => {
-  const navigate = useNavigate();
-  
-  // Automatically navigate to dashboard on component mount
-  useEffect(() => {
-    navigate('/dashboard');
-  }, [navigate]);
-
   return (
     <AuthLayout 
       title="Welcome Back"
-      subtitle="Redirecting to dashboard..."
+      subtitle="Enter your credentials to access your account"
       linkText="Don't have an account? Sign up"
       linkTo="/signup"
     >
-      <div className="flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      <LoginForm />
+      
+      <div className="mt-6 text-center text-sm text-gray-500">
+        <p>This is a demo application with role-based access control.</p>
+        <p>Use the quick login buttons to try different roles.</p>
+        <p className="mt-2">
+          <Link to="/auth" className="text-blue-600 hover:underline">
+            Go to Auth Page
+          </Link>
+        </p>
       </div>
     </AuthLayout>
   );

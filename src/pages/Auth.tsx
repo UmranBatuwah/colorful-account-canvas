@@ -1,9 +1,10 @@
 
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import LoginForm from '@/components/auth/LoginForm';
-import SignupFormSimple from '@/components/auth/SignupFormSimple';
+import SignupFormWithRole from '@/components/auth/signup/SignupFormWithRole';
 import AuthCard from '@/components/auth/AuthCard';
 
 const Auth = () => {
@@ -31,7 +32,7 @@ const Auth = () => {
         
         <AuthCard 
           loginContent={<LoginForm />} 
-          signupContent={<SignupFormSimple />} 
+          signupContent={<SignupFormWithRole />} 
         />
       </div>
     </div>

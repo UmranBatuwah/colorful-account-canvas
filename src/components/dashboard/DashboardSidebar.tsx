@@ -4,36 +4,44 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { Home, BarChart2, PieChart, FilePlus, Database, CreditCard, Tag, Settings, ChevronLeft, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/AuthContext';
+import RoleBasedAccess from '@/components/auth/RoleBasedAccess';
 
 const DashboardSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const { userRole } = useAuth();
   
   const menuItems = [
     {
       title: 'Dashboard',
       icon: Home,
       path: '/dashboard',
+      allowedRoles: ['admin', 'manager', 'user'],
     },
     {
       title: 'Transactions',
       icon: CreditCard,
       path: '/transactions',
+      allowedRoles: ['admin', 'manager', 'user'],
     },
     {
       title: 'Categories',
       icon: Tag,
       path: '/categories',
+      allowedRoles: ['admin', 'manager'],
     },
     {
       title: 'Invoices',
       icon: FileText,
       path: '/invoices',
+      allowedRoles: ['admin', 'manager'],
     },
     {
       title: 'Reports',
       icon: BarChart2,
       path: '/reports',
+      allowedRoles: ['admin', 'manager', 'user'],
     },
   ];
 
@@ -71,20 +79,21 @@ const DashboardSidebar = () => {
       <div className="flex flex-col flex-1 overflow-y-auto py-4 px-3">
         <nav className="space-y-1">
           {menuItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) => cn(
-                'flex items-center px-3 py-2 rounded-lg transition-colors',
-                isActive 
-                  ? 'bg-primary text-white' 
-                  : 'text-gray-700 hover:bg-gray-100',
-                collapsed && 'justify-center'
-              )}
-            >
-              <item.icon className={cn("h-5 w-5", collapsed ? 'mx-0' : 'mr-3')} />
-              {!collapsed && <span>{item.title}</span>}
-            </NavLink>
+            <RoleBasedAccess key={item.path} allowedRoles={item.allowedRoles}>
+              <NavLink
+                to={item.path}
+                className={({ isActive }) => cn(
+                  'flex items-center px-3 py-2 rounded-lg transition-colors',
+                  isActive 
+                    ? 'bg-primary text-white' 
+                    : 'text-gray-700 hover:bg-gray-100',
+                  collapsed && 'justify-center'
+                )}
+              >
+                <item.icon className={cn("h-5 w-5", collapsed ? 'mx-0' : 'mr-3')} />
+                {!collapsed && <span>{item.title}</span>}
+              </NavLink>
+            </RoleBasedAccess>
           ))}
         </nav>
       </div>
@@ -104,6 +113,20 @@ const DashboardSidebar = () => {
           {!collapsed && <span>Settings</span>}
         </NavLink>
       </div>
+      
+      {!collapsed && (
+        <div className="p-4 border-t border-gray-200">
+          <div className="flex items-center">
+            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white">
+              {userRole.charAt(0).toUpperCase()}
+            </div>
+            <div className="ml-3">
+              <p className="text-sm font-medium">{userRole.charAt(0).toUpperCase() + userRole.slice(1)}</p>
+              <p className="text-xs text-gray-500">Role-based access</p>
+            </div>
+          </div>
+        </div>
+      )}
     </aside>
   );
 };
