@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -30,27 +31,44 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  // Create a mock user that matches the User type from Supabase
-  const mockUser = {
-    id: "mock-user-id",
-    email: "user@example.com",
-    user_metadata: { first_name: "Guest", role: 'admin' },
-    app_metadata: {}, // required field
-    aud: "authenticated", // required field
-    created_at: new Date().toISOString(), // required field
-    role: "",
-    updated_at: new Date().toISOString(),
-  } as User;
-  
-  const [user, setUser] = useState<User | null>(mockUser);
-  const [session, setSession] = useState<Session | null>({ user: mockUser, access_token: "mock-token", refresh_token: "mock-refresh-token" } as Session);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [userRole, setUserRole] = useState<UserRole>('admin');
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [userRole, setUserRole] = useState<UserRole>('user');
   const { toast } = useToast();
+  const navigate = useNavigate();
   
   useEffect(() => {
-    // Skip actual authentication checks
-    setIsLoading(false);
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, currentSession) => {
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        
+        // Check user role if logged in
+        if (currentSession?.user) {
+          setUserRole((currentSession.user.user_metadata?.role as UserRole) || 'user');
+        }
+        
+        setIsLoading(false);
+      }
+    );
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
+      
+      if (currentSession?.user) {
+        setUserRole((currentSession.user.user_metadata?.role as UserRole) || 'user');
+      }
+      
+      setIsLoading(false);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   // Function to check if user has required role access
@@ -59,53 +77,108 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return requiredRoles.includes(userRole);
   };
 
-  // Mock login function - automatically succeeds
+  // Login function
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      // In a real app, this would verify credentials and set the correct role
-      const role = email.includes('admin') ? 'admin' : 
-                  email.includes('manager') ? 'manager' : 'user';
-      setUserRole(role as UserRole);
-      
-      toast({
-        title: "Login successful",
-        description: `Welcome back, ${role}!`,
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
-      return Promise.resolve();
+
+      if (error) throw error;
+
+      if (data?.user) {
+        setUser(data.user);
+        setSession(data.session);
+        setUserRole((data.user.user_metadata?.role as UserRole) || 'user');
+        
+        toast({
+          title: "Login successful",
+          description: `Welcome back!`,
+        });
+        
+        navigate('/dashboard');
+      }
+    } catch (error: any) {
+      toast({
+        title: "Login failed",
+        description: error.message,
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Mock signup function with role assignment
+  // Signup function with role assignment
   const signup = async (email: string, password: string, name: string, role: UserRole = 'user') => {
     setIsLoading(true);
     try {
-      // In a real app, this would register the user with the specified role
-      setUserRole(role);
-      
-      toast({
-        title: "Account created successfully",
-        description: `Welcome, ${name}! You have been assigned the role: ${role}`,
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            first_name: name,
+            role: role,
+          },
+        },
       });
-      return Promise.resolve();
+
+      if (error) throw error;
+
+      if (data?.user) {
+        setUser(data.user);
+        setSession(data.session);
+        setUserRole(role);
+        
+        toast({
+          title: "Account created successfully",
+          description: `Welcome, ${name}! You have been assigned the role: ${role}`,
+        });
+        
+        navigate('/dashboard');
+      }
+    } catch (error: any) {
+      toast({
+        title: "Signup failed",
+        description: error.message,
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Mock logout function - does nothing
+  // Logout function
   const logout = async () => {
-    // No actual logout needed
+    try {
+      await supabase.auth.signOut();
+      setUser(null);
+      setSession(null);
+      setUserRole('user');
+      navigate('/login');
+      
+      toast({
+        title: "Logged out successfully",
+        description: "You have been logged out of your account",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Logout failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
     <AuthContext.Provider
       value={{
-        user: mockUser,
-        session: { user: mockUser, access_token: "mock-token", refresh_token: "mock-refresh-token" } as Session,
-        isAuthenticated: true, // Always authenticated
+        user,
+        session,
+        isAuthenticated: !!user,
         isLoading,
         userRole,
         hasAccess,

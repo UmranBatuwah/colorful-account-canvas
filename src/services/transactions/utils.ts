@@ -1,28 +1,25 @@
 
-import { Transaction, TransactionType } from '@/types';
+import { Transaction } from '@/types';
 
-// Helper function to map Supabase transaction data to our Transaction type
-export const mapTransactionData = (transaction: any): Transaction => {
-  // Cast type to TransactionType to ensure it matches our defined types
-  const transactionType = transaction.type as TransactionType;
-  
+// Map Supabase response to our application's Transaction type
+export const mapTransactionData = (data: any): Transaction => {
   return {
-    id: transaction.id,
-    description: transaction.description || '',
-    amount: Number(transaction.amount),
-    date: new Date(transaction.date),
-    type: transactionType,
-    categoryId: transaction.category_id,
-    note: transaction.note || '',
-    createdAt: new Date(transaction.created_at),
-    updatedAt: new Date(transaction.updated_at),
-    category: transaction.categories ? {
-      id: transaction.categories.id,
-      name: transaction.categories.name,
-      color: transaction.categories.color,
-      type: transaction.categories.type as TransactionType,
-      description: transaction.categories.description,
-      createdAt: new Date()
-    } : undefined
+    id: data.id,
+    description: data.description || '',
+    amount: Number(data.amount),
+    date: new Date(data.date),
+    type: data.type,
+    categoryId: data.category_id || '',
+    category: data.categories ? {
+      id: data.categories.id,
+      name: data.categories.name,
+      description: data.categories.description,
+      color: data.categories.color,
+      type: data.categories.type,
+      createdAt: new Date(data.categories.created_at)
+    } : undefined,
+    note: data.note || '',
+    createdAt: new Date(data.created_at),
+    updatedAt: new Date(data.updated_at)
   };
 };
