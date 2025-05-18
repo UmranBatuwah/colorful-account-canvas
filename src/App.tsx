@@ -15,6 +15,7 @@ import Categories from "./pages/Categories";
 import Reports from "./pages/Reports";
 import Invoices from "./pages/Invoices";
 import Settings from "./pages/Settings";
+import UserManagement from "./pages/UserManagement";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./context/AuthContext";
 import { initializeSupabaseData } from "./integrations/supabase/client";
@@ -34,6 +35,7 @@ const AppRoutes = () => {
       <Route path="/reports" element={<Reports />} />
       <Route path="/invoices" element={<Invoices />} />
       <Route path="/settings" element={<Settings />} />
+      <Route path="/users" element={<UserManagement />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

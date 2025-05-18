@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, BarChart2, PieChart, FilePlus, Database, CreditCard, Tag, Settings, ChevronLeft, FileText } from 'lucide-react';
+import { Home, BarChart2, PieChart, FilePlus, Database, CreditCard, Tag, Settings, ChevronLeft, FileText, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useAuth, UserRole } from '@/context/AuthContext';
@@ -42,6 +42,12 @@ const DashboardSidebar = () => {
       icon: BarChart2,
       path: '/reports',
       allowedRoles: ['admin', 'manager', 'user'] as UserRole[],
+    },
+    {
+      title: 'Users',
+      icon: Users,
+      path: '/users',
+      allowedRoles: ['admin'] as UserRole[],
     },
   ];
 
