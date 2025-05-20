@@ -1,4 +1,3 @@
-
 import { Category } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,49 +14,35 @@ export const createCategory = async (category: Omit<Category, 'id' | 'createdAt'
     }
 
     const newCategory = {
-      ...category,
-      user_id: user.id,
-      type: category.type // TransactionType is already valid for the DB
+      name: category.name,
+      description: category.description || '',
+      color: category.color || '#3B82F6',
+      type: category.type,
+      created_at: new Date().toISOString()
     };
+    
+    console.log('Attempting to create category with data:', newCategory);
     
     const { data, error } = await supabase
       .from('categories')
       .insert([newCategory])
-      .select()
+      .select('*')
       .single();
     
     if (error) {
-      console.error('Error creating category:', error);
-      // Fall back to local storage
-      const { categories } = getLocalStorageData();
-      
-      const localNewCategory: Category = {
-        ...category,
-        id: uuidv4(),
-        createdAt: new Date(),
-      };
-      
-      const updatedCategories = [...categories, localNewCategory];
-      saveCategoriesToLocalStorage(updatedCategories);
-      
-      return localNewCategory;
+      console.error('Supabase error creating category:', error);
+      throw new Error(error.message || 'Failed to create category');
     }
 
+    if (!data) {
+      console.error('No data returned from Supabase after category creation');
+      throw new Error('No data returned after category creation');
+    }
+
+    console.log('Category created successfully in Supabase:', data);
     return transformCategory(data);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in createCategory:', error);
-    // Fall back to local storage
-    const { categories } = getLocalStorageData();
-    
-    const localNewCategory: Category = {
-      ...category,
-      id: uuidv4(),
-      createdAt: new Date(),
-    };
-    
-    const updatedCategories = [...categories, localNewCategory];
-    saveCategoriesToLocalStorage(updatedCategories);
-    
-    return localNewCategory;
+    throw error;
   }
 };

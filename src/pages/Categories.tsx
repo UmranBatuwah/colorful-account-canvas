@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Category } from '@/types';
@@ -35,7 +34,9 @@ const Categories = () => {
     setIsSubmitting(true);
     
     try {
+      console.log('Adding category with data:', data);
       const newCategory = await createCategory(data);
+      console.log('Category created successfully:', newCategory);
       
       setCategories([...categories, newCategory]);
       
@@ -45,10 +46,11 @@ const Categories = () => {
       });
       
       setIsAddingCategory(false);
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Detailed error:', error);
       toast({
         title: 'Error',
-        description: 'Failed to add category',
+        description: error.message || 'Failed to add category',
         variant: 'destructive',
       });
     } finally {
