@@ -85,7 +85,8 @@ const InvoiceList = ({ invoices, onEdit }: InvoiceListProps) => {
                   </TableCell>
                   <TableCell>{format(new Date(invoice.issueDate), "MMM d, yyyy")}</TableCell>
                   <TableCell>{format(new Date(invoice.dueDate), "MMM d, yyyy")}</TableCell>
-                  <TableCell>${invoice.total.toFixed(2)}</TableCell>
+                  <TableCell>N/A </TableCell>
+                  {/* <TableCell>${invoice.total.toFixed(2)}</TableCell> */}
                   <TableCell>
                     <InvoiceStatusBadge status={invoice.status} />
                   </TableCell>

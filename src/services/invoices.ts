@@ -1,5 +1,4 @@
 import { Invoice, InvoiceItem, InvoiceStatus } from '@/types';
-import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
 
 // Status options with colors
@@ -19,140 +18,139 @@ const generateInvoiceNumber = (): string => {
   return `${prefix}-${timestamp}${random}`;
 };
 
-// Initialize local storage with empty data (no mock data)
-const initializeInvoices = (): void => {
-  if (!localStorage.getItem('invoices')) {
-    localStorage.setItem('invoices', JSON.stringify([]));
-  }
-};
+// Map Supabase invoice to application invoice
+const mapSupabaseInvoice = (invoice: any): Invoice => ({
+  id: invoice.id,
+  invoiceNumber: invoice.invoice_number,
+  customerName: invoice.customer_name,
+  customerEmail: invoice.customer_email,
+  issueDate: new Date(invoice.issue_date),
+  dueDate: new Date(invoice.due_date),
+  items: invoice.items as InvoiceItem[],
+  subtotal: invoice.subtotal,
+  taxRate: invoice.tax_rate,
+  taxAmount: invoice.tax_amount,
+  total: invoice.total,
+  notes: invoice.notes,
+  status: invoice.status,
+  createdAt: new Date(invoice.created_at),
+  updatedAt: new Date(invoice.updated_at)
+});
+
+// Map application invoice to Supabase invoice
+const mapToSupabaseInvoice = (invoice: Partial<Invoice>): any => ({
+  invoice_number: invoice.invoiceNumber,
+  customer_name: invoice.customerName,
+  customer_email: invoice.customerEmail,
+  issue_date: invoice.issueDate?.toISOString(),
+  due_date: invoice.dueDate?.toISOString(),
+  items: invoice.items,
+  subtotal: invoice.subtotal,
+  tax_rate: invoice.taxRate,
+  tax_amount: invoice.taxAmount,
+  total: invoice.total,
+  notes: invoice.notes,
+  status: invoice.status,
+  user_id: supabase.auth.getUser().then(({ data }) => data.user?.id)
+});
 
 // Get all invoices
 export const getInvoices = async (): Promise<Invoice[]> => {
   try {
-    // Initialize with empty data instead of mock data
-    initializeInvoices();
-    const invoices = localStorage.getItem('invoices');
-    return invoices ? JSON.parse(invoices) : [];
+    const { data: invoices, error } = await supabase
+      .from('invoices')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    return invoices.map(mapSupabaseInvoice);
   } catch (error) {
     console.error('Error in getInvoices:', error);
-    initializeInvoices();
-    const invoices = localStorage.getItem('invoices');
-    return invoices ? JSON.parse(invoices) : [];
+    throw error;
   }
 };
 
 // Get invoice by ID
 export const getInvoiceById = async (id: string): Promise<Invoice | undefined> => {
   try {
-    // Use local storage for now
-    initializeInvoices();
-    const invoices = localStorage.getItem('invoices');
-    const parsedInvoices = invoices ? JSON.parse(invoices) : [];
-    return parsedInvoices.find((invoice: Invoice) => invoice.id === id);
+    const { data: invoice, error } = await supabase
+      .from('invoices')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) throw error;
+    if (!invoice) return undefined;
+
+    return mapSupabaseInvoice(invoice);
   } catch (error) {
     console.error('Error in getInvoiceById:', error);
-    initializeInvoices();
-    const invoices = localStorage.getItem('invoices');
-    const parsedInvoices = invoices ? JSON.parse(invoices) : [];
-    return parsedInvoices.find((invoice: Invoice) => invoice.id === id);
+    throw error;
   }
 };
 
 // Create a new invoice
 export const createInvoice = async (invoice: Omit<Invoice, 'id' | 'invoiceNumber' | 'createdAt' | 'updatedAt'>): Promise<Invoice> => {
   try {
-    // Use local storage for now
-    initializeInvoices();
-    const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-    
-    const localNewInvoice: Invoice = {
-      ...invoice,
-      id: uuidv4(),
-      invoiceNumber: generateInvoiceNumber(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
+    const newInvoice = {
+      ...mapToSupabaseInvoice(invoice),
+      invoice_number: generateInvoiceNumber(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     };
-    
-    invoices.push(localNewInvoice);
-    localStorage.setItem('invoices', JSON.stringify(invoices));
-    
-    return localNewInvoice;
+
+    const { data, error } = await supabase
+      .from('invoices')
+      .insert([newInvoice])
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return mapSupabaseInvoice(data);
   } catch (error) {
     console.error('Error in createInvoice:', error);
-    // Fall back to creating locally
-    initializeInvoices();
-    const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-    
-    const localNewInvoice: Invoice = {
-      ...invoice,
-      id: uuidv4(),
-      invoiceNumber: generateInvoiceNumber(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    
-    invoices.push(localNewInvoice);
-    localStorage.setItem('invoices', JSON.stringify(invoices));
-    
-    return localNewInvoice;
+    throw error;
   }
 };
 
 // Update an existing invoice
 export const updateInvoice = async (invoice: Invoice): Promise<Invoice> => {
   try {
-    // Use local storage for now
-    initializeInvoices();
-    const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-    const index = invoices.findIndex((inv: Invoice) => inv.id === invoice.id);
-    
-    if (index !== -1) {
-      const updatedInvoice = {
-        ...invoice,
-        updatedAt: new Date(),
-      };
-      invoices[index] = updatedInvoice;
-      localStorage.setItem('invoices', JSON.stringify(invoices));
-      return updatedInvoice;
-    }
-    
-    throw new Error(`Invoice with id ${invoice.id} not found`);
+    const updatedInvoice = {
+      ...mapToSupabaseInvoice(invoice),
+      updated_at: new Date().toISOString()
+    };
+
+    const { data, error } = await supabase
+      .from('invoices')
+      .update(updatedInvoice)
+      .eq('id', invoice.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return mapSupabaseInvoice(data);
   } catch (error) {
     console.error('Error in updateInvoice:', error);
-    // Fall back to updating locally
-    initializeInvoices();
-    const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-    const index = invoices.findIndex((inv: Invoice) => inv.id === invoice.id);
-    
-    if (index !== -1) {
-      const updatedInvoice = {
-        ...invoice,
-        updatedAt: new Date(),
-      };
-      invoices[index] = updatedInvoice;
-      localStorage.setItem('invoices', JSON.stringify(invoices));
-      return updatedInvoice;
-    }
-    
-    throw new Error(`Invoice with id ${invoice.id} not found`);
+    throw error;
   }
 };
 
 // Delete an invoice
 export const deleteInvoice = async (id: string): Promise<void> => {
   try {
-    // Use local storage for now
-    initializeInvoices();
-    let invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-    invoices = invoices.filter((invoice: Invoice) => invoice.id !== id);
-    localStorage.setItem('invoices', JSON.stringify(invoices));
+    const { error } = await supabase
+      .from('invoices')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
   } catch (error) {
     console.error('Error in deleteInvoice:', error);
-    // Fall back to deleting locally
-    initializeInvoices();
-    let invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-    invoices = invoices.filter((invoice: Invoice) => invoice.id !== id);
-    localStorage.setItem('invoices', JSON.stringify(invoices));
+    throw error;
   }
 };
 

@@ -154,6 +154,71 @@ export type Database = {
           },
         ]
       }
+      invoices: {
+        Row: {
+          id: string
+          invoice_number: string
+          customer_name: string
+          customer_email: string
+          issue_date: string
+          due_date: string
+          items: Json
+          subtotal: number
+          tax_rate: number
+          tax_amount: number
+          total: number
+          notes: string | null
+          status: string
+          created_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          invoice_number: string
+          customer_name: string
+          customer_email: string
+          issue_date: string
+          due_date: string
+          items: Json
+          subtotal: number
+          tax_rate: number
+          tax_amount: number
+          total: number
+          notes?: string | null
+          status: string
+          created_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          invoice_number?: string
+          customer_name?: string
+          customer_email?: string
+          issue_date?: string
+          due_date?: string
+          items?: Json
+          subtotal?: number
+          tax_rate?: number
+          tax_amount?: number
+          total?: number
+          notes?: string | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
