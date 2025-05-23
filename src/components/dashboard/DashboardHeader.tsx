@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell, Search } from 'lucide-react';
@@ -43,18 +42,20 @@ const DashboardHeader = ({ title }: DashboardHeaderProps) => {
   return (
     <>
       <header className="bg-white border-b border-gray-200 px-4 py-3 flex justify-between items-center">
-        <h1 className="text-2xl font-bold hidden md:block">{title}</h1>
+        <div className="flex items-center">
+          <h1 className="text-xl sm:text-2xl font-bold ml-12 lg:ml-0">{title}</h1>
+        </div>
         
-        <div className="flex items-center ml-auto space-x-4">
-          <Button variant="outline" size="icon" onClick={handleOpenSearch}>
+        <div className="flex items-center space-x-2 sm:space-x-4">
+          <Button variant="outline" size="icon" onClick={handleOpenSearch} className="hidden sm:flex">
             <Search className="h-5 w-5" />
           </Button>
           
-          <Button variant="outline" size="icon">
+          <Button variant="outline" size="icon" className="hidden sm:flex">
             <Bell className="h-5 w-5" />
           </Button>
           
-          <Badge className={`${getRoleBadgeColor(userRole)} text-white`}>
+          <Badge className={`${getRoleBadgeColor(userRole)} text-white hidden sm:flex`}>
             {userRole.charAt(0).toUpperCase() + userRole.slice(1)}
           </Badge>
           

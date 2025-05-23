@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation } from 'react-router-dom';
@@ -143,11 +142,11 @@ const Transactions = () => {
 
   return (
     <DashboardLayout title="Transactions">
-      <div className="mb-6 flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Manage Transactions</h2>
+      <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 className="text-xl sm:text-2xl font-bold">Manage Transactions</h2>
         <Button 
           onClick={() => setIsAddingTransaction(true)}
-          className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+          className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
         >
           <Plus className="h-4 w-4 mr-2" />
           Add Transaction
@@ -162,7 +161,7 @@ const Transactions = () => {
       
       {/* Add Transaction Dialog */}
       <Dialog open={isAddingTransaction} onOpenChange={setIsAddingTransaction}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[600px] w-[95vw] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Add Transaction</DialogTitle>
             <DialogDescription>

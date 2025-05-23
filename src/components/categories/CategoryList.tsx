@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Search, Edit2, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -106,7 +105,7 @@ const CategoryList = ({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             placeholder="Search categories..."
-            className="pl-10"
+            className="pl-10 w-full"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -114,10 +113,10 @@ const CategoryList = ({
       </div>
       
       <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-4">
-          <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="income">Income</TabsTrigger>
-          <TabsTrigger value="expense">Expense</TabsTrigger>
+        <TabsList className="mb-4 w-full sm:w-auto">
+          <TabsTrigger value="all" className="flex-1 sm:flex-none">All</TabsTrigger>
+          <TabsTrigger value="income" className="flex-1 sm:flex-none">Income</TabsTrigger>
+          <TabsTrigger value="expense" className="flex-1 sm:flex-none">Expense</TabsTrigger>
         </TabsList>
         
         <TabsContent value={activeTab} className="space-y-4">
@@ -145,7 +144,7 @@ const CategoryList = ({
       
       {/* Edit Category Dialog */}
       <Dialog open={isEditing} onOpenChange={(open) => !isSubmitting && setIsEditing(open)}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[500px] w-[95vw] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Category</DialogTitle>
             <DialogDescription>

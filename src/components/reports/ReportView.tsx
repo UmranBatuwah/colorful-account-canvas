@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { 
   Card, 
@@ -44,11 +43,11 @@ const ReportView = ({ transactions, categories }: ReportViewProps) => {
   
   // Format currency helper
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
+      maximumFractionDigits: 0
     }).format(amount);
   };
   
@@ -180,13 +179,13 @@ const ReportView = ({ transactions, categories }: ReportViewProps) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Financial Reports</h2>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 className="text-xl sm:text-2xl font-bold">Financial Reports</h2>
         <Select
           value={timeRange}
           onValueChange={setTimeRange}
         >
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue placeholder="Select time range" />
           </SelectTrigger>
           <SelectContent>
@@ -200,30 +199,30 @@ const ReportView = ({ transactions, categories }: ReportViewProps) => {
       
       <Card className="border-0 shadow-md">
         <CardHeader>
-          <CardTitle>Income vs. Expenses</CardTitle>
+          <CardTitle className="text-lg sm:text-xl">Income vs. Expenses</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-[300px]">
+          <div className="h-[250px] sm:h-[300px]">
             <ReportChart data={monthlyData} />
           </div>
         </CardContent>
       </Card>
       
       <Tabs defaultValue="expense" value={activeCategory} onValueChange={(v) => setActiveCategory(v as 'income' | 'expense')}>
-        <TabsList className="mb-4">
-          <TabsTrigger value="expense">Expenses by Category</TabsTrigger>
-          <TabsTrigger value="income">Income by Category</TabsTrigger>
+        <TabsList className="mb-4 w-full sm:w-auto">
+          <TabsTrigger value="expense" className="flex-1 sm:flex-none">Expenses by Category</TabsTrigger>
+          <TabsTrigger value="income" className="flex-1 sm:flex-none">Income by Category</TabsTrigger>
         </TabsList>
         
         <TabsContent value={activeCategory}>
           <Card className="border-0 shadow-md">
             <CardHeader>
-              <CardTitle>
+              <CardTitle className="text-lg sm:text-xl">
                 {activeCategory === 'expense' ? 'Expenses' : 'Income'} by Category
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[400px]">
+              <div className="h-[300px] sm:h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -231,7 +230,7 @@ const ReportView = ({ transactions, categories }: ReportViewProps) => {
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      outerRadius={130}
+                      outerRadius={window.innerWidth < 640 ? 100 : 130}
                       fill="#8884d8"
                       dataKey="value"
                       nameKey="name"
@@ -252,9 +251,9 @@ const ReportView = ({ transactions, categories }: ReportViewProps) => {
                             x={x}
                             y={y}
                             fill="white"
-                            textAnchor={x > cx ? "start" : "end"}
+                            textAnchor={x > cx ? 'start' : 'end'}
                             dominantBaseline="central"
-                            fontSize={12}
+                            fontSize={window.innerWidth < 640 ? 10 : 12}
                           >
                             {`${(percent * 100).toFixed(0)}%`}
                           </text>
@@ -267,8 +266,22 @@ const ReportView = ({ transactions, categories }: ReportViewProps) => {
                     </Pie>
                     <Tooltip
                       formatter={(value: number) => formatCurrency(value)}
+                      contentStyle={{
+                        backgroundColor: 'white',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                        fontSize: window.innerWidth < 640 ? '12px' : '14px',
+                      }}
                     />
-                    <Legend />
+                    <Legend
+                      layout="horizontal"
+                      verticalAlign="bottom"
+                      align="center"
+                      wrapperStyle={{
+                        paddingTop: '20px',
+                        fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                      }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               </div>

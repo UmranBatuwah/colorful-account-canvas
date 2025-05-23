@@ -1,4 +1,3 @@
-
 import { Transaction } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
@@ -18,9 +17,11 @@ interface RecentTransactionsProps {
 
 const RecentTransactions = ({ transactions }: RecentTransactionsProps) => {
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
     }).format(amount);
   };
   

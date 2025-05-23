@@ -1,4 +1,3 @@
-
 import { FinancialSummary } from '@/types';
 import { ArrowUpRight, ArrowDownRight, DollarSign } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,9 +10,11 @@ const DashboardStats = ({ summary }: DashboardStatsProps) => {
   const { totalIncome, totalExpense, balance } = summary;
   
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
     }).format(amount);
   };
 

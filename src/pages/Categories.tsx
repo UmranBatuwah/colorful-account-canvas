@@ -112,11 +112,11 @@ const Categories = () => {
 
   return (
     <DashboardLayout title="Categories">
-      <div className="mb-6 flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Manage Categories</h2>
+      <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 className="text-xl sm:text-2xl font-bold">Manage Categories</h2>
         <Button 
           onClick={() => setIsAddingCategory(true)}
-          className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+          className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
         >
           <Plus className="h-4 w-4 mr-2" />
           Add Category
@@ -131,7 +131,7 @@ const Categories = () => {
       
       {/* Add Category Dialog */}
       <Dialog open={isAddingCategory} onOpenChange={setIsAddingCategory}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[500px] w-[95vw] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Add Category</DialogTitle>
             <DialogDescription>

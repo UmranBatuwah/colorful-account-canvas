@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import ReportView from '@/components/reports/ReportView';
@@ -25,8 +24,8 @@ const Reports = () => {
   return (
     <DashboardLayout title="Reports">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold">Financial Reports</h2>
-        <p className="text-gray-500">
+        <h2 className="text-xl sm:text-2xl font-bold">Financial Reports</h2>
+        <p className="text-sm sm:text-base text-gray-500">
           Analyze your financial data with visual reports
         </p>
       </div>

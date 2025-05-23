@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2, UserPlus } from 'lucide-react';
@@ -20,7 +19,7 @@ const UserManagement = () => {
       try {
         const { data: users, error } = await supabase
           .from('profiles')
-          .select('id, first_name, last_name, role, created_at')
+          .select('id, first_name, last_name, role, created_at, email')
           .order('created_at', { ascending: false });
           
         if (error) throw error;
@@ -49,14 +48,14 @@ const UserManagement = () => {
     <DashboardLayout title="User Management">
       <RoleBasedAccess allowedRoles={['admin']}>
         <div className="space-y-6">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <h2 className="text-2xl font-bold">User Management</h2>
-              <p className="text-muted-foreground">Manage users and their roles</p>
+              <h2 className="text-xl sm:text-2xl font-bold">User Management</h2>
+              <p className="text-sm sm:text-base text-muted-foreground">Manage users and their roles</p>
             </div>
             <Button 
               onClick={() => setIsInviteDialogOpen(true)}
-              className="flex items-center"
+              className="w-full sm:w-auto flex items-center"
             >
               <UserPlus className="mr-2 h-4 w-4" />
               Invite User

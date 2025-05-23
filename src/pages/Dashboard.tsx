@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import DashboardStats from '@/components/dashboard/DashboardStats';
@@ -81,11 +80,11 @@ const Dashboard = () => {
 
   return (
     <DashboardLayout title="Dashboard">
-      <div className="mb-6 flex justify-between items-center">
+      <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-2xl font-bold">Financial Overview</h2>
         <Button 
           onClick={() => setIsAddingTransaction(true)}
-          className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+          className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
         >
           <Plus className="h-4 w-4 mr-2" />
           Add Transaction
@@ -94,14 +93,18 @@ const Dashboard = () => {
       
       {summary && <DashboardStats summary={summary} />}
       
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <TransactionChart data={mockMonthlyData} />
-        {summary && <RecentTransactions transactions={summary.recentTransactions} />}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6">
+        <div className="w-full overflow-x-auto">
+          <TransactionChart data={mockMonthlyData} />
+        </div>
+        <div className="w-full">
+          {summary && <RecentTransactions transactions={summary.recentTransactions} />}
+        </div>
       </div>
       
       {/* Add Transaction Dialog */}
       <Dialog open={isAddingTransaction} onOpenChange={setIsAddingTransaction}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[600px] w-[95vw] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Add Transaction</DialogTitle>
             <DialogDescription>

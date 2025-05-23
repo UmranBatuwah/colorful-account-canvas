@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { 
@@ -30,6 +29,7 @@ interface User {
   last_name: string | null;
   role: UserRole;
   created_at: string;
+  email: string;
 }
 
 interface UsersListProps {
@@ -71,26 +71,94 @@ const UsersList = ({ users, onUpdate }: UsersListProps) => {
 
   return (
     <div className="border rounded-md">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>User</TableHead>
-            <TableHead>Role</TableHead>
-            <TableHead>Created</TableHead>
-            <TableHead className="w-[80px]">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {users.length === 0 ? (
+      {/* Desktop Table View */}
+      <div className="hidden md:block">
+        <Table>
+          <TableHeader>
             <TableRow>
-              <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
-                No users found
-              </TableCell>
+              <TableHead>User</TableHead>
+              <TableHead>Role</TableHead>
+              <TableHead>Created</TableHead>
+              <TableHead className="w-[80px]">Actions</TableHead>
             </TableRow>
-          ) : (
-            users.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell className="font-medium">
+          </TableHeader>
+          <TableBody>
+            {users.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                  No users found
+                </TableCell>
+              </TableRow>
+            ) : (
+              users.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell className="font-medium">
+                    <div className="flex items-center gap-3">
+                      <Avatar>
+                        <AvatarFallback>
+                          {getInitials(user.first_name, user.last_name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium">
+                          {user.first_name} {user.last_name}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {user.email}
+                        </p>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={getRoleBadgeColor(user.role)}>
+                      {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {format(new Date(user.created_at), 'MMM d, yyyy')}
+                  </TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => {
+                          setSelectedUser(user);
+                          setIsUpdateRoleDialogOpen(true);
+                        }}>
+                          Change Role
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => {
+                          // In a real app, you'd use the user's actual email
+                          handleResendInvite(user.email);
+                        }}>
+                          Resend Invitation
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden">
+        {users.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            No users found
+          </div>
+        ) : (
+          <div className="divide-y">
+            {users.map((user) => (
+              <div key={user.id} className="p-4">
+                <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <Avatar>
                       <AvatarFallback>
@@ -102,21 +170,10 @@ const UsersList = ({ users, onUpdate }: UsersListProps) => {
                         {user.first_name} {user.last_name}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {/* In a real app, you'd get the email from your users table */}
-                        {`user-${user.id.substring(0, 6)}@example.com`}
+                        {user.email}
                       </p>
                     </div>
                   </div>
-                </TableCell>
-                <TableCell>
-                  <Badge className={getRoleBadgeColor(user.role)}>
-                    {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-muted-foreground">
-                  {format(new Date(user.created_at), 'MMM d, yyyy')}
-                </TableCell>
-                <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
@@ -132,19 +189,26 @@ const UsersList = ({ users, onUpdate }: UsersListProps) => {
                         Change Role
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => {
-                        // In a real app, you'd use the user's actual email
-                        handleResendInvite(`user-${user.id.substring(0, 6)}@example.com`);
+                        handleResendInvite(user.email);
                       }}>
                         Resend Invitation
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+                </div>
+                <div className="flex items-center justify-between">
+                  <Badge className={getRoleBadgeColor(user.role)}>
+                    {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                  </Badge>
+                  <span className="text-sm text-muted-foreground">
+                    {format(new Date(user.created_at), 'MMM d, yyyy')}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {selectedUser && (
         <UpdateUserRoleDialog 
