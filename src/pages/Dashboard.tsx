@@ -10,21 +10,19 @@ import { Plus } from 'lucide-react';
 import { Transaction, FinancialSummary, MonthlyData } from '@/types';
 import { getTransactions, createTransaction } from '@/services/transactions';
 import { getCategories } from '@/services/categories';
-import { calculateFinancialSummary, mockMonthlyData, initializeLocalStorage } from '@/services/mockData';
+import { calculateFinancialSummary, calculateMonthlyData } from '@/services/mockData';
 import { useToast } from '@/hooks/use-toast';
 
 const Dashboard = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [categories, setCategories] = useState([]);
   const [summary, setSummary] = useState<FinancialSummary | null>(null);
+  const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([]);
   const [isAddingTransaction, setIsAddingTransaction] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   
   useEffect(() => {
-    // Clear existing data and start fresh
-    initializeLocalStorage();
-    
     // Load transactions and categories
     const loadData = async () => {
       const fetchedTransactions = await getTransactions();
@@ -39,7 +37,11 @@ const Dashboard = () => {
         fetchedCategories
       );
       
+      // Calculate monthly data for chart
+      const monthlyChartData = calculateMonthlyData(fetchedTransactions);
+      
       setSummary(financialSummary);
+      setMonthlyData(monthlyChartData);
     };
     
     loadData();
@@ -59,7 +61,11 @@ const Dashboard = () => {
         categories
       );
       
+      // Update monthly data
+      const monthlyChartData = calculateMonthlyData([...transactions, newTransaction]);
+      
       setSummary(financialSummary);
+      setMonthlyData(monthlyChartData);
       
       toast({
         title: 'Transaction added',
@@ -95,7 +101,7 @@ const Dashboard = () => {
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6">
         <div className="w-full overflow-x-auto">
-          <TransactionChart data={mockMonthlyData} />
+          <TransactionChart data={monthlyData} />
         </div>
         <div className="w-full">
           {summary && <RecentTransactions transactions={summary.recentTransactions} />}

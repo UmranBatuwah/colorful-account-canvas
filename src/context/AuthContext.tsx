@@ -4,8 +4,8 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Session, User } from "@supabase/supabase-js";
 
-// Define available user roles, now including 'manager'
-export type UserRole = 'admin' | 'manager' | 'user';
+// Define available user roles
+export type UserRole = 'admin' | 'user';
 
 type AuthContextType = {
   user: User | null;

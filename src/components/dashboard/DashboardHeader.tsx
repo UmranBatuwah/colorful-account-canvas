@@ -30,12 +30,11 @@ const DashboardHeader = ({ title }: DashboardHeaderProps) => {
   const getRoleBadgeColor = (role: string) => {
     switch(role) {
       case 'admin':
-        return 'bg-red-500 hover:bg-red-600';
-      case 'manager':
-        return 'bg-blue-500 hover:bg-blue-600';
+        return 'bg-blue-100 text-blue-800';
       case 'user':
+        return 'bg-green-100 text-green-800';
       default:
-        return 'bg-green-500 hover:bg-green-600';
+        return 'bg-gray-100 text-gray-800';
     }
   };
   

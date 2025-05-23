@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -21,7 +20,7 @@ import { z } from 'zod';
 // Define an extended schema that includes role
 const signupWithRoleSchema = signupFormSchema.and(
   z.object({
-    role: z.enum(['admin', 'manager', 'user'] as const)
+    role: z.enum(['admin', 'user'] as const)
   })
 );
 
@@ -138,7 +137,6 @@ const SignupFormWithRole = () => {
                   </FormControl>
                   <SelectContent>
                     <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="manager">Manager</SelectItem>
                     <SelectItem value="user">User</SelectItem>
                   </SelectContent>
                 </Select>

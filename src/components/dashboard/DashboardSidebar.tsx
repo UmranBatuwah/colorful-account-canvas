@@ -17,31 +17,31 @@ const DashboardSidebar = () => {
       title: 'Dashboard',
       icon: Home,
       path: '/dashboard',
-      allowedRoles: ['admin', 'manager', 'user'] as UserRole[],
+      allowedRoles: ['admin', 'user'] as UserRole[],
     },
     {
       title: 'Transactions',
       icon: CreditCard,
       path: '/transactions',
-      allowedRoles: ['admin', 'manager', 'user'] as UserRole[],
+      allowedRoles: ['admin', 'user'] as UserRole[],
     },
     {
       title: 'Categories',
       icon: Tag,
       path: '/categories',
-      allowedRoles: ['admin', 'manager', 'user'] as UserRole[],
+      allowedRoles: ['admin', 'user'] as UserRole[],
     },
     {
       title: 'Invoices',
       icon: FileText,
       path: '/invoices',
-      allowedRoles: ['admin', 'manager'] as UserRole[],
+      allowedRoles: ['admin'] as UserRole[],
     },
     {
       title: 'Reports',
       icon: BarChart2,
       path: '/reports',
-      allowedRoles: ['admin', 'manager', 'user'] as UserRole[],
+      allowedRoles: ['admin', 'user'] as UserRole[],
     },
     {
       title: 'Users',
@@ -81,7 +81,7 @@ const DashboardSidebar = () => {
         <div className="p-4 flex items-center justify-between">
           {!collapsed && (
             <h2 className="text-xl font-bold text-gradient">
-              FinTrackr
+              Promode Agro Farms
             </h2>
           )}
           <Button

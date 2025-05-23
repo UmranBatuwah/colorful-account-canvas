@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -39,7 +38,7 @@ interface UpdateUserRoleDialogProps {
 }
 
 const updateRoleSchema = z.object({
-  role: z.enum(['admin', 'manager', 'user'] as const)
+  role: z.enum(['admin', 'user'] as const)
 });
 
 type UpdateRoleFormValues = z.infer<typeof updateRoleSchema>;
@@ -113,9 +112,8 @@ const UpdateUserRoleDialog = ({ isOpen, onClose, user, onSuccess }: UpdateUserRo
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="admin">Administrator</SelectItem>
-                      <SelectItem value="manager">Manager</SelectItem>
-                      <SelectItem value="user">Regular User</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="user">User</SelectItem>
                     </SelectContent>
                   </Select>
                 </FormItem>

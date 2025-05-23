@@ -208,18 +208,95 @@ const ReportView = ({ transactions, categories }: ReportViewProps) => {
         </CardContent>
       </Card>
       
-      <Tabs defaultValue="expense" value={activeCategory} onValueChange={(v) => setActiveCategory(v as 'income' | 'expense')}>
+      <Tabs defaultValue="expense" onValueChange={(value) => setActiveCategory(value as 'income' | 'expense')}>
         <TabsList className="mb-4 w-full sm:w-auto">
           <TabsTrigger value="expense" className="flex-1 sm:flex-none">Expenses by Category</TabsTrigger>
           <TabsTrigger value="income" className="flex-1 sm:flex-none">Income by Category</TabsTrigger>
         </TabsList>
         
-        <TabsContent value={activeCategory}>
+        <TabsContent value="expense">
           <Card className="border-0 shadow-md">
             <CardHeader>
-              <CardTitle className="text-lg sm:text-xl">
-                {activeCategory === 'expense' ? 'Expenses' : 'Income'} by Category
-              </CardTitle>
+              <CardTitle className="text-lg sm:text-xl">Expenses by Category</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px] sm:h-[400px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={categoryData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      outerRadius={window.innerWidth < 640 ? 100 : 130}
+                      fill="#8884d8"
+                      dataKey="value"
+                      nameKey="name"
+                      label={({
+                        cx,
+                        cy,
+                        midAngle,
+                        innerRadius,
+                        outerRadius,
+                        percent,
+                      }) => {
+                        const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+                        const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
+                        const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
+                        
+                        return percent > 0.05 ? (
+                          <text
+                            x={x}
+                            y={y}
+                            fill="white"
+                            textAnchor={x > cx ? 'start' : 'end'}
+                            dominantBaseline="central"
+                            fontSize={window.innerWidth < 640 ? 10 : 12}
+                          >
+                            {`${(percent * 100).toFixed(0)}%`}
+                          </text>
+                        ) : null;
+                      }}
+                    >
+                      {categoryData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      formatter={(value: number) => formatCurrency(value)}
+                      contentStyle={{
+                        backgroundColor: 'white',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                        fontSize: window.innerWidth < 640 ? '12px' : '14px',
+                      }}
+                    />
+                    <Legend
+                      layout="horizontal"
+                      verticalAlign="bottom"
+                      align="center"
+                      wrapperStyle={{
+                        paddingTop: '20px',
+                        fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              
+              {categoryData.length === 0 && (
+                <div className="text-center py-10">
+                  <p className="text-gray-500">No data available</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="income">
+          <Card className="border-0 shadow-md">
+            <CardHeader>
+              <CardTitle className="text-lg sm:text-xl">Income by Category</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-[300px] sm:h-[400px]">

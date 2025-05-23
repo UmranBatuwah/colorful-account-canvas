@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -112,9 +111,6 @@ const LoginForm = () => {
         <div className="flex justify-center gap-2">
           <Button variant="outline" size="sm" onClick={() => handleQuickLogin('admin')}>
             Admin
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => handleQuickLogin('manager')}>
-            Manager
           </Button>
           <Button variant="outline" size="sm" onClick={() => handleQuickLogin('user')}>
             User

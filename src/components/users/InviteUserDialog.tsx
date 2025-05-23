@@ -29,7 +29,7 @@ const inviteFormSchema = z.object({
   firstName: z.string().min(2, "First name is required"),
   lastName: z.string().min(2, "Last name is required"),
   email: z.string().email("Please enter a valid email"),
-  role: z.enum(['admin', 'manager', 'user'] as const)
+  role: z.enum(['admin', 'user'] as const)
 });
 
 type InviteFormValues = z.infer<typeof inviteFormSchema>;
@@ -162,9 +162,8 @@ const InviteUserDialog = ({ isOpen, onClose, onSuccess }: InviteUserDialogProps)
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="admin">Administrator</SelectItem>
-                      <SelectItem value="manager">Manager</SelectItem>
-                      <SelectItem value="user">Regular User</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="user">User</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

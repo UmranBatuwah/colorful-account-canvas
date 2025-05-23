@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -45,7 +44,7 @@ const TransactionForm = ({
       amount: transaction?.amount || 0,
       date: transaction?.date ? new Date(transaction.date) : new Date(),
       type: transaction?.type || 'expense',
-      categoryId: transaction?.categoryId || '',
+      categoryId: transaction?.categoryId?.toString() || '',
       note: transaction?.note || '',
     },
   });

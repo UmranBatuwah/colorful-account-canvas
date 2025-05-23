@@ -115,3 +115,38 @@ export const calculateFinancialSummary = (transactions: Transaction[], categorie
     expenseByCategory,
   };
 };
+
+export const calculateMonthlyData = (transactions: Transaction[]): MonthlyData[] => {
+  const monthlyData: { [key: string]: { income: number; expense: number } } = {};
+  
+  // Initialize last 6 months
+  const today = new Date();
+  for (let i = 0; i < 6; i++) {
+    const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
+    const monthKey = date.toLocaleString('default', { month: 'short' });
+    monthlyData[monthKey] = { income: 0, expense: 0 };
+  }
+  
+  // Calculate totals for each month
+  transactions.forEach(transaction => {
+    const date = new Date(transaction.date);
+    const monthKey = date.toLocaleString('default', { month: 'short' });
+    
+    if (monthlyData[monthKey]) {
+      if (transaction.type === 'income') {
+        monthlyData[monthKey].income += transaction.amount;
+      } else {
+        monthlyData[monthKey].expense += transaction.amount;
+      }
+    }
+  });
+  
+  // Convert to array and reverse to show most recent months first
+  return Object.entries(monthlyData)
+    .map(([month, data]) => ({
+      month,
+      income: data.income,
+      expense: data.expense
+    }))
+    .reverse();
+};
