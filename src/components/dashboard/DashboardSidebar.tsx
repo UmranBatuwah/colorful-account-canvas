@@ -29,7 +29,7 @@ const DashboardSidebar = () => {
       title: 'Categories',
       icon: Tag,
       path: '/categories',
-      allowedRoles: ['admin', 'manager'] as UserRole[],
+      allowedRoles: ['admin', 'manager', 'user'] as UserRole[],
     },
     {
       title: 'Invoices',

@@ -1,7 +1,7 @@
-
 import { ArrowUpRight, ArrowDownRight, Edit2, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Category } from '@/types';
+import { useAuth } from '@/context/AuthContext';
 
 interface CategoryItemProps {
   category: Category;
@@ -10,6 +10,9 @@ interface CategoryItemProps {
 }
 
 const CategoryItem = ({ category, onEdit, onDelete }: CategoryItemProps) => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
+
   return (
     <div className="p-4">
       <div className="flex justify-between items-center">
@@ -48,14 +51,16 @@ const CategoryItem = ({ category, onEdit, onDelete }: CategoryItemProps) => {
           >
             <Edit2 className="h-4 w-4" />
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0 text-red-500"
-            onClick={onDelete}
-          >
-            <Trash className="h-4 w-4" />
-          </Button>
+          {isAdmin && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 text-red-500"
+              onClick={onDelete}
+            >
+              <Trash className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
       

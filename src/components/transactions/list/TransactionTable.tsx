@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/table';
 import { Card, CardContent } from '@/components/ui/card';
 import { Transaction, Category } from '@/types';
+import { useAuth } from '@/context/AuthContext';
 
 interface TransactionTableProps {
   transactions: Transaction[];
@@ -27,6 +28,8 @@ const TransactionTable = ({
   onDelete,
   shouldHighlight
 }: TransactionTableProps) => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
   
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -105,14 +108,16 @@ const TransactionTable = ({
               >
                 <Edit2 className="h-4 w-4" />
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0 text-red-500"
-                onClick={() => onDelete(transaction)}
-              >
-                <Trash className="h-4 w-4" />
-              </Button>
+              {isAdmin && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 text-red-500"
+                  onClick={() => onDelete(transaction)}
+                >
+                  <Trash className="h-4 w-4" />
+                </Button>
+              )}
             </div>
           </div>
         </CardContent>
@@ -199,14 +204,16 @@ const TransactionTable = ({
                         >
                           <Edit2 className="h-4 w-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 text-red-500"
-                          onClick={() => onDelete(transaction)}
-                        >
-                          <Trash className="h-4 w-4" />
-                        </Button>
+                        {isAdmin && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 text-red-500"
+                            onClick={() => onDelete(transaction)}
+                          >
+                            <Trash className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>
