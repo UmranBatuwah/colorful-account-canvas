@@ -157,7 +157,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(null);
       setSession(null);
       setUserRole('user');
-      navigate('/login');
+      navigate('/auth');
       
       toast({
         title: "Logged out successfully",

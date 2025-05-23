@@ -1,4 +1,3 @@
-
 import { Navigate } from "react-router-dom";
 import { useAuth, UserRole } from "@/context/AuthContext";
 
@@ -21,7 +20,7 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
   
   // If not authenticated, redirect to login
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/auth" replace />;
   }
   
   // If roles are specified and user doesn't have access, show unauthorized
