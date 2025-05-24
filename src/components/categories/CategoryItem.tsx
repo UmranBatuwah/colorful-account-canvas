@@ -11,7 +11,7 @@ interface CategoryItemProps {
 
 const CategoryItem = ({ category, onEdit, onDelete }: CategoryItemProps) => {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = user?.user_metadata?.role === 'admin';
 
   return (
     <div className="p-4">

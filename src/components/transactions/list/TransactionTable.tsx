@@ -29,7 +29,7 @@ const TransactionTable = ({
   shouldHighlight
 }: TransactionTableProps) => {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = user?.user_metadata?.role === 'admin';
   
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -82,7 +82,7 @@ const TransactionTable = ({
             </div>
           </div>
           
-          <div className="flex justify-between items-center mt-2">
+          <div className="flex justify-between items-center mt-4">
             <div className="flex items-center">
               <span
                 className={`p-1 rounded-full mr-2 ${
