@@ -15,6 +15,7 @@ type AuthContextType = {
   userRole: UserRole;
   hasAccess: (requiredRoles: UserRole[]) => boolean;
   login: (email: string, password: string) => Promise<void>;
+  loginWithEmail: (email: string) => Promise<void>;
   signup: (email: string, password: string, name: string, role?: UserRole) => Promise<void>;
   logout: () => void;
 };
@@ -110,6 +111,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // Login with email function
+  const loginWithEmail = async (email: string) => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth`,
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Login link sent",
+        description: "Please check your email for the login link.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Failed to send login link",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Signup function with role assignment
   const signup = async (email: string, password: string, name: string, role: UserRole = 'user') => {
     setIsLoading(true);
@@ -182,6 +211,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         userRole,
         hasAccess,
         login,
+        loginWithEmail,
         signup,
         logout,
       }}
