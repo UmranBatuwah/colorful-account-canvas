@@ -32,12 +32,6 @@ const DashboardSidebar = () => {
       allowedRoles: ['admin', 'user'] as UserRole[],
     },
     {
-      title: 'Invoices',
-      icon: FileText,
-      path: '/invoices',
-      allowedRoles: ['admin'] as UserRole[],
-    },
-    {
       title: 'Reports',
       icon: BarChart2,
       path: '/reports',
