@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -21,14 +20,14 @@ const Settings = () => {
         </div>
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full md:w-auto grid-cols-2 md:grid-cols-4 gap-2">
-            <TabsTrigger value="profile">Profile</TabsTrigger>
-            <TabsTrigger value="account">Account</TabsTrigger>
-            <TabsTrigger value="appearance">Appearance</TabsTrigger>
-            <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-2 overflow-x-auto">
+            <TabsTrigger value="profile" className="whitespace-nowrap">Profile</TabsTrigger>
+            <TabsTrigger value="account" className="whitespace-nowrap">Account</TabsTrigger>
+            <TabsTrigger value="appearance" className="whitespace-nowrap">Appearance</TabsTrigger>
+            <TabsTrigger value="notifications" className="whitespace-nowrap">Notifications</TabsTrigger>
           </TabsList>
           
-          <div className="mt-6">
+          <div className="mt-6 px-2 md:px-0">
             <TabsContent value="profile">
               <ProfileSettings />
             </TabsContent>

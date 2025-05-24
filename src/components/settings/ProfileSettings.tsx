@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -97,19 +96,19 @@ const ProfileSettings = () => {
       <CardContent>
         <div className="space-y-6">
           <div className="flex flex-col items-center sm:flex-row sm:items-start gap-4">
-            <div className="flex flex-col items-center gap-2">
-              <Avatar className="h-24 w-24">
+            <div className="flex flex-col items-center gap-2 w-full sm:w-auto">
+              <Avatar className="h-20 w-20 sm:h-24 sm:w-24">
                 <AvatarImage src={user?.user_metadata?.avatar_url || ''} />
                 <AvatarFallback className="text-lg">
                   {getInitials()}
                 </AvatarFallback>
               </Avatar>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="flex gap-2">
+              <div className="flex gap-2 w-full sm:w-auto justify-center">
+                <Button variant="outline" size="sm" className="flex gap-2 flex-1 sm:flex-none">
                   <Upload className="h-4 w-4" />
                   Upload
                 </Button>
-                <Button variant="outline" size="sm" className="flex gap-1">
+                <Button variant="outline" size="sm" className="flex gap-1 flex-1 sm:flex-none">
                   <X className="h-4 w-4" />
                   Remove
                 </Button>
@@ -118,7 +117,7 @@ const ProfileSettings = () => {
             <div className="w-full">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name="firstName"
@@ -162,7 +161,7 @@ const ProfileSettings = () => {
                     )}
                   />
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name="company"
@@ -211,7 +210,7 @@ const ProfileSettings = () => {
                   />
                   
                   <div className="flex justify-end">
-                    <Button type="submit" disabled={isLoading}>
+                    <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
                       {isLoading ? 'Saving...' : 'Save changes'}
                     </Button>
                   </div>
