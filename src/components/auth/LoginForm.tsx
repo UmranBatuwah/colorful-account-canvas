@@ -58,14 +58,6 @@ const LoginForm = () => {
     }
   };
 
-  const handleQuickLogin = (role: string) => {
-    const email = `${role}@example.com`;
-    const password = 'password123';
-    form.setValue('email', email);
-    form.setValue('password', password);
-    form.handleSubmit((data) => onSubmit(data))();
-  };
-
   return (
     <div className="space-y-4">
       <Form {...form}>
@@ -103,36 +95,6 @@ const LoginForm = () => {
           </Button>
         </form>
       </Form>
-
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">
-            Or try demo accounts
-          </span>
-        </div>
-      </div>
-
-      <div className="flex gap-2">
-        <Button
-          variant="outline"
-          className="flex-1"
-          onClick={() => handleQuickLogin('admin')}
-          disabled={isLoading}
-        >
-          Admin
-        </Button>
-        <Button
-          variant="outline"
-          className="flex-1"
-          onClick={() => handleQuickLogin('user')}
-          disabled={isLoading}
-        >
-          User
-        </Button>
-      </div>
     </div>
   );
 };
