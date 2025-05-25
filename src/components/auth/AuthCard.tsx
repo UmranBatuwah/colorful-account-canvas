@@ -1,4 +1,3 @@
-
 import { ReactNode } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -18,9 +17,9 @@ const AuthCard = ({ loginContent, signupContent }: AuthCardProps) => {
         </CardDescription>
       </CardHeader>
       <Tabs defaultValue="login" className="w-full">
-        <TabsList className="grid grid-cols-2 w-full">
+        <TabsList className="grid grid-cols-1 w-full">
           <TabsTrigger value="login">Login</TabsTrigger>
-          <TabsTrigger value="signup">Sign up</TabsTrigger>
+          {/* <TabsTrigger value="signup">Sign up</TabsTrigger> */}
         </TabsList>
         
         <TabsContent value="login">
@@ -29,11 +28,11 @@ const AuthCard = ({ loginContent, signupContent }: AuthCardProps) => {
           </CardContent>
         </TabsContent>
         
-        <TabsContent value="signup">
+        {/* <TabsContent value="signup">
           <CardContent className="pt-4">
             {signupContent}
           </CardContent>
-        </TabsContent>
+        </TabsContent> */}
       </Tabs>
     </Card>
   );
