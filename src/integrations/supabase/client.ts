@@ -35,14 +35,8 @@ export const initializeSupabaseData = async () => {
     if (!existingCategories || existingCategories.count === 0) {
       // Add default categories
       const defaultCategories = [
-        { name: 'Salary', type: 'income', color: '#10B981', description: 'Regular income from employment' },
-        { name: 'Freelance', type: 'income', color: '#6366F1', description: 'Income from freelance work' },
-        { name: 'Investments', type: 'income', color: '#8B5CF6', description: 'Income from investments' },
-        { name: 'Groceries', type: 'expense', color: '#EF4444', description: 'Food and household supplies' },
-        { name: 'Rent', type: 'expense', color: '#F59E0B', description: 'Monthly rent or mortgage payment' },
-        { name: 'Utilities', type: 'expense', color: '#3B82F6', description: 'Electricity, water, internet, etc.' },
-        { name: 'Entertainment', type: 'expense', color: '#EC4899', description: 'Movies, games, subscriptions' },
-        { name: 'Transportation', type: 'expense', color: '#14B8A6', description: 'Public transport, fuel, car maintenance' }
+        // { name: 'Salary', type: 'income', color: '#10B981', description: 'Regular income from employment' },
+       
       ];
 
       await supabase.from('categories').insert(defaultCategories);

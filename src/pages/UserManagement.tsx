@@ -54,8 +54,9 @@ const UserManagement = () => {
               <p className="text-sm sm:text-base text-muted-foreground">Manage users and their roles</p>
             </div>
             <Button 
-              onClick={() => setIsInviteDialogOpen(true)}
-              className="w-full sm:w-auto flex items-center"
+            // disabled={true}
+              // onClick={() => setIsInviteDialogOpen(true)}
+              className="w-full cursor-not-allowed sm:w-auto flex items-center"
             >
               <UserPlus className="mr-2 h-4 w-4" />
               Invite User
